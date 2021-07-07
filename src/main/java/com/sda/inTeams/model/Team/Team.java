@@ -3,6 +3,7 @@ package com.sda.inTeams.model.Team;
 import com.sda.inTeams.model.Project.Project;
 import com.sda.inTeams.model.User.User;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +12,7 @@ import java.util.Set;
 
 @Entity
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Team {
