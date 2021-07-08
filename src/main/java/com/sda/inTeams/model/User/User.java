@@ -38,4 +38,13 @@ public class User implements Indexable {
     @OneToMany(mappedBy = "creator")
     private Set<Comment> commentsCreated;
 
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                '}';
+    }
 }

@@ -38,4 +38,11 @@ public class Team implements Indexable {
     @OneToMany(mappedBy = "projectOwner")
     private Set<Project> projects;
 
+    @Override
+    public String toString() {
+        return "Team{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }
