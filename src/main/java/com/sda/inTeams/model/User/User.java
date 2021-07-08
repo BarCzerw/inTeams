@@ -2,8 +2,10 @@ package com.sda.inTeams.model.User;
 
 
 import com.sda.inTeams.model.Comment.Comment;
+import com.sda.inTeams.model.Indexable;
 import com.sda.inTeams.model.Team.Team;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,9 +14,10 @@ import java.util.Set;
 
 @Entity
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+public class User implements Indexable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

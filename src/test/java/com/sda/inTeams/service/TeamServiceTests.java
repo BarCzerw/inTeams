@@ -1,5 +1,6 @@
 package com.sda.inTeams.service;
 
+import com.sda.inTeams.TestUtility;
 import com.sda.inTeams.exception.InvalidOperation;
 import com.sda.inTeams.model.Team.Team;
 import com.sda.inTeams.repository.TeamRepository;
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @SpringBootTest
@@ -33,98 +36,76 @@ public class TeamServiceTests {
     @Nested
     class TeamManagementTest {
 
-        private final String[] TEAM_NAMES = new String[]{
-                "Test Team 001",
-                "Test Team 002",
-                "Test Team 007"
-        };
+        private final List<Team> INITIAL_TEAMS = new ArrayList<>(List.of(
+                Team.builder().name("Test Team 001").build(),
+                Team.builder().name("Test Team 002").build(),
+                Team.builder().name("Test Team 007").build()
+        ));
+
+        private final long INITIAL_TEAMS_SIZE = INITIAL_TEAMS.size();
 
         @BeforeEach
         void setupTest() {
-            clearDatabase();
-            assert_databaseInitiallyEmpty();
-            addInitialTeams();
+            TestUtility.clearDatabase(teamRepository);
+            TestUtility.assert_databaseSize(teamRepository, 0L);
+            TestUtility.addInitialData(teamRepository, INITIAL_TEAMS);
         }
 
         @Test
         void canGetAllTeams() {
-            assert_allTeamsCount(3);
+            Assertions.assertEquals(INITIAL_TEAMS_SIZE, teamService.getAllTeams().size());
         }
 
         @Test
         void canGetTeamByValidId() {
-            assert_gettingTeamById(getValidId(),true);
+            assert_gettingTeamById(TestUtility.getValidObjectId(teamRepository), true);
         }
 
         @Test
         void cannotGetTeamByInvalidId() {
-            assert_gettingTeamById(-1L,false);
+            assert_gettingTeamById(-1L, false);
         }
 
         @Test
         void canAddValidTeam() {
-            String NEW_TEAM_NAME = "New Test Team 001";
             try {
                 teamService.addTeam(
                         Team.builder()
-                        .name(NEW_TEAM_NAME)
-                        .build());
+                                .name("New Test Team 001")
+                                .build());
             } catch (InvalidOperation invalidOperation) {
                 invalidOperation.printStackTrace();
             }
-            assert_allTeamsCount(4);
+            TestUtility.assert_databaseSize(teamRepository, INITIAL_TEAMS_SIZE+1);
         }
 
         @Test
         void cannotAddInvalidTeam() {
             Assertions.assertThrows(InvalidOperation.class, () -> teamService.addTeam(null));
-            assert_allTeamsCount(3);
+            TestUtility.assert_databaseSize(teamRepository, INITIAL_TEAMS_SIZE);
         }
 
         @Test
         void canRemoveValidTeam() {
             try {
-                teamService.removeTeam(getValidId());
+                teamService.removeTeam(TestUtility.getValidObjectId(teamRepository));
             } catch (InvalidOperation invalidOperation) {
                 invalidOperation.printStackTrace();
             }
+            TestUtility.assert_databaseSize(teamRepository, INITIAL_TEAMS_SIZE - 1);
+
         }
 
         @Test
         void cannotRemoveInvalidTeam() {
             Assertions.assertThrows(InvalidOperation.class, () -> teamService.removeTeam(-1L));
-        }
-
-        private void clearDatabase() {
-            teamRepository.deleteAll();
-        }
-
-        private void assert_databaseInitiallyEmpty() {
-            Assertions.assertEquals(0,teamService.getAllTeams().size());
-        }
-
-        private void addInitialTeams() {
-            for (String teamName : TEAM_NAMES) {
-                teamRepository.save(
-                        Team.builder()
-                                .name(teamName)
-                                .build());
-            }
-        }
-
-        private long getValidId() {
-            return teamRepository.findAll().get(0).getId();
+            TestUtility.assert_databaseSize(teamRepository, INITIAL_TEAMS_SIZE);
         }
 
         private void assert_gettingTeamById(long id, boolean expectedValue) {
             Optional<Team> teamOptional = teamService.getTeamById(id);
-            Assertions.assertEquals(expectedValue,teamOptional.isPresent());
+            Assertions.assertEquals(expectedValue, teamOptional.isPresent());
         }
-
-        private void assert_allTeamsCount(int expected) {
-            Assertions.assertEquals(expected,teamService.getAllTeams().size());
-        }
-
 
     }
 

@@ -1,5 +1,6 @@
 package com.sda.inTeams.model.Team;
 
+import com.sda.inTeams.model.Indexable;
 import com.sda.inTeams.model.Project.Project;
 import com.sda.inTeams.model.User.User;
 import lombok.AllArgsConstructor;
@@ -15,7 +16,7 @@ import java.util.Set;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Team {
+public class Team implements Indexable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
