@@ -22,14 +22,13 @@ public class Team implements Indexable {
     private String name;
 
     @ManyToOne()
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private User teamOwner;
 
-    @ManyToMany()
-    @JoinTable(
-            name = "teams_users",
-            joinColumns = @JoinColumn(name = "team_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
+    @ManyToMany(fetch = FetchType.EAGER)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<User> members;
 
     @OneToMany(mappedBy = "projectOwner")
