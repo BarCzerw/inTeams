@@ -4,6 +4,7 @@ import com.sda.inTeams.TestUtility;
 import com.sda.inTeams.exception.InvalidOperation;
 import com.sda.inTeams.model.Team.Team;
 import com.sda.inTeams.model.User.User;
+import com.sda.inTeams.repository.ProjectRepository;
 import com.sda.inTeams.repository.TeamRepository;
 import com.sda.inTeams.repository.UserRepository;
 import org.junit.jupiter.api.*;
@@ -24,12 +25,14 @@ public class TeamServiceTests {
     private final UserRepository userRepository;
     private final TeamService teamService;
     private final UserService userService;
+    private final ProjectRepository projectRepository;
 
     @Autowired
-    public TeamServiceTests(TeamRepository teamRepository, TeamService teamService, UserRepository userRepository) {
+    public TeamServiceTests(TeamRepository teamRepository, TeamService teamService, UserRepository userRepository, ProjectRepository projectRepository) {
         this.teamRepository = teamRepository;
         this.userRepository = userRepository;
-        this.teamService = new TeamService(teamRepository, userRepository);
+        this.projectRepository = projectRepository;
+        this.teamService = new TeamService(teamRepository, userRepository,projectRepository);
         this.userService = new UserService(userRepository, teamRepository);
     }
 

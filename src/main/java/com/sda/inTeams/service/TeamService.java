@@ -1,8 +1,10 @@
 package com.sda.inTeams.service;
 
 import com.sda.inTeams.exception.InvalidOperation;
+import com.sda.inTeams.model.Project.Project;
 import com.sda.inTeams.model.Team.Team;
 import com.sda.inTeams.model.User.User;
+import com.sda.inTeams.repository.ProjectRepository;
 import com.sda.inTeams.repository.TeamRepository;
 import com.sda.inTeams.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ public class TeamService {
 
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
+    private final ProjectRepository projectRepository;
 
     public List<Team> getAllTeams() {
         return teamRepository.findAll();
@@ -95,21 +98,35 @@ public class TeamService {
         }
     }
 
-    private boolean isUserMemberOfTeam(Team team, User user) {
+    public boolean isUserMemberOfTeam(Team team, User user) {
         return team.getMembers().contains(user);
     }
 
-    private boolean isUserOwnerOfTeam(Team team, User user) {
+    public boolean isUserOwnerOfTeam(Team team, User user) {
         Optional<User> userOptional = Optional.ofNullable(team.getTeamOwner());
         return userOptional.map(value -> value.equals(user)).orElse(false);
     }
 
-    private User getUserByIdOrError(long userId) throws InvalidOperation {
-        return userRepository.findById(userId).orElseThrow(() -> new InvalidOperation("User id:" + userId + " not found!"));
+    public User getUserByIdOrError(long userId) throws InvalidOperation {
+        return userRepository.findById(userId).orElseThrow(
+                () -> new InvalidOperation("User id:" + userId + " not found!"));
     }
 
-    private Team getTeamByIdOrError(long teamId) throws InvalidOperation {
+    public Team getTeamByIdOrError(long teamId) throws InvalidOperation {
         return teamRepository.findById(teamId).orElseThrow(() -> new InvalidOperation("Team id:" + teamId + " not found!"));
+    }
+
+    public void addProjectToTeam(long teamId, long projectId) throws InvalidOperation {
+        Team team = getTeamByIdOrError(teamId);
+        Project project = projectRepository.findById(projectId).orElseThrow();
+        if (!team.getProjects().contains(project)) {
+            team.getProjects().add(project);
+            saveTeamToDatabase(team);
+        } else {
+            throw new InvalidOperation(
+                    "Cannot add project id:" + projectId + " to team id:" + teamId + " - Project already belongs to Team"
+            );
+        }
     }
 
     private void saveTeamToDatabase(Team team) {
