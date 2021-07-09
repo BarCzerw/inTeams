@@ -3,10 +3,7 @@ package com.sda.inTeams.model.Project;
 import com.sda.inTeams.model.Indexable;
 import com.sda.inTeams.model.Task.Task;
 import com.sda.inTeams.model.Team.Team;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -31,6 +28,8 @@ public class Project implements Indexable {
     private ProjectStatus status;
 
     @OneToMany(mappedBy = "project")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<Task> tasks;
 
 }

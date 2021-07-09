@@ -3,10 +3,7 @@ package com.sda.inTeams.model.Team;
 import com.sda.inTeams.model.Indexable;
 import com.sda.inTeams.model.Project.Project;
 import com.sda.inTeams.model.User.User;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -36,13 +33,8 @@ public class Team implements Indexable {
     private Set<User> members;
 
     @OneToMany(mappedBy = "projectOwner")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<Project> projects;
 
-    @Override
-    public String toString() {
-        return "Team{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                '}';
-    }
 }

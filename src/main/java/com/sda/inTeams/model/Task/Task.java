@@ -3,10 +3,7 @@ package com.sda.inTeams.model.Task;
 import com.sda.inTeams.model.Comment.Comment;
 import com.sda.inTeams.model.Indexable;
 import com.sda.inTeams.model.Project.Project;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -31,5 +28,7 @@ public class Task implements Indexable {
     private Project project;
 
     @OneToMany(mappedBy = "task")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<Comment> comments;
 }
