@@ -2,12 +2,11 @@ package com.sda.inTeams.service;
 
 import com.sda.inTeams.TestUtility;
 import com.sda.inTeams.exception.InvalidOperation;
+import com.sda.inTeams.model.Team.Team;
 import com.sda.inTeams.model.User.User;
+import com.sda.inTeams.repository.TeamRepository;
 import com.sda.inTeams.repository.UserRepository;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -20,13 +19,17 @@ import java.util.Optional;
 @ActiveProfiles("tests")
 public class UserServiceTests {
 
+    private final TeamRepository teamRepository;
+    private final TeamService teamService;
     private final UserRepository userRepository;
     private final UserService userService;
 
     @Autowired
-    public UserServiceTests(UserRepository userRepository, UserService userService) {
+    public UserServiceTests(UserRepository userRepository, TeamRepository teamRepository) {
         this.userRepository = userRepository;
-        this.userService = new UserService(userRepository);
+        this.teamRepository = teamRepository;
+        this.teamService = new TeamService(teamRepository, userRepository);
+        this.userService = new UserService(userRepository,teamRepository);
     }
 
     @Test
@@ -42,6 +45,8 @@ public class UserServiceTests {
                 User.builder().firstName("Ewa").lastName("Nowak").build()
         ));
 
+        private final Team INITIAL_TEAM = Team.builder().name("Test Team 001").build();
+
         private final long INITIAL_USERS_SIZE = INITIAL_USERS.size();
 
         @BeforeEach
@@ -49,6 +54,20 @@ public class UserServiceTests {
             TestUtility.clearDatabase(userRepository);
             TestUtility.assert_databaseSize(userRepository, 0L);
             TestUtility.addInitialData(userRepository, INITIAL_USERS);
+            TestUtility.clearDatabase(teamRepository);
+            TestUtility.assert_databaseSize(teamRepository, 0L);
+        }
+
+        @AfterEach
+        void cleanup() throws InvalidOperation {
+            for (Team team : teamService.getAllTeams()) {
+                teamService.removeTeam(team.getId());
+            }
+            teamRepository.flush();
+            for (User user : userService.getAllUsers()) {
+                userService.removeUser(user.getId());
+            }
+            userRepository.flush();
         }
 
         @Test
@@ -67,7 +86,7 @@ public class UserServiceTests {
         }
 
         @Test
-        void canAddValidTeam() {
+        void canAddValidUser() {
             try {
                 userService.addUser(
                         User.builder()
@@ -87,9 +106,10 @@ public class UserServiceTests {
         }
 
         @Test
-        void canRemoveValidTeam() {
+        void canRemoveValidUserNotAnOwnerOfTeam() {
+            teamRepository.save(INITIAL_TEAM);
             try {
-                userService.removeUser(TestUtility.getValidObjectId(userRepository));
+                userService.removeUser(userRepository.findByFirstNameAndLastName("Adam", "Mickiewicz").orElseThrow().getId());
             } catch (InvalidOperation invalidOperation) {
                 invalidOperation.printStackTrace();
             }
@@ -97,7 +117,16 @@ public class UserServiceTests {
         }
 
         @Test
-        void cannotRemoveInvalidTeam() {
+        void cannotRemoveOwnerOfTeam() {
+            User user = userRepository.findByFirstNameAndLastName("Jan", "Kowalski").orElseThrow();
+            INITIAL_TEAM.setTeamOwner(user);
+            teamRepository.save(INITIAL_TEAM);
+            Assertions.assertThrows(InvalidOperation.class, () -> userService.removeUser(user.getId()));
+            TestUtility.assert_databaseSize(userRepository, INITIAL_USERS_SIZE);
+        }
+
+        @Test
+        void cannotRemoveInvalidUser() {
             Assertions.assertThrows(InvalidOperation.class, () -> userService.removeUser(-1L));
             TestUtility.assert_databaseSize(userRepository, INITIAL_USERS_SIZE);
         }
