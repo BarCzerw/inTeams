@@ -2,6 +2,7 @@ package com.sda.inTeams.service;
 
 import com.sda.inTeams.exception.InvalidOperation;
 import com.sda.inTeams.model.Project.Project;
+import com.sda.inTeams.model.Project.ProjectStatus;
 import com.sda.inTeams.model.Team.Team;
 import com.sda.inTeams.repository.ProjectRepository;
 import com.sda.inTeams.repository.TeamRepository;
@@ -37,4 +38,13 @@ public class ProjectService {
                 () -> new InvalidOperation("Project id:" + projectId + " not found!"));
     }
 
+    public Project changeStatus(long projectId, ProjectStatus status) throws InvalidOperation {
+        Project project = projectRepository.findById(projectId).orElseThrow(() -> new InvalidOperation("Project id:" + projectId + " not found!"));
+        project.setStatus(status);
+        return saveProjectToDatabase(project);
+    }
+
+    private Project saveProjectToDatabase(Project project) {
+        return projectRepository.save(project);
+    }
 }

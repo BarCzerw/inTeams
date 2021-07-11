@@ -11,6 +11,5 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findAllByTeamsContaining(Team team);
-
     Optional<User> findByFirstNameAndLastName(String firstName, String lastName);
 }

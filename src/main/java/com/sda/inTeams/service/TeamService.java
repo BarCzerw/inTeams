@@ -10,10 +10,7 @@ import com.sda.inTeams.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +43,7 @@ public class TeamService {
     public void removeTeam(long teamId) throws InvalidOperation {
         Team team = getTeamByIdOrError(teamId);
         List<User> teamMembers = userRepository.findAllByTeamsContaining(team);
+        projectRepository.deleteAllByProjectOwner(team);
         for (User member : teamMembers) {
             Set<Team> teamsContaining = teamRepository.findAllByMembersContaining(member);
             for (Team teamCon : teamsContaining) {
@@ -118,10 +116,12 @@ public class TeamService {
 
     public void addProjectToTeam(long teamId, long projectId) throws InvalidOperation {
         Team team = getTeamByIdOrError(teamId);
-        Project project = projectRepository.findById(projectId).orElseThrow();
+        Project project = projectRepository.findById(projectId).orElseThrow(() -> new InvalidOperation("Project id:" + projectId + " not found!"));
         if (!team.getProjects().contains(project)) {
             team.getProjects().add(project);
             saveTeamToDatabase(team);
+            project.setProjectOwner(team);
+            projectRepository.save(project);
         } else {
             throw new InvalidOperation(
                     "Cannot add project id:" + projectId + " to team id:" + teamId + " - Project already belongs to Team"
@@ -129,8 +129,20 @@ public class TeamService {
         }
     }
 
+    public void removeProject(long teamId, long projectId) throws InvalidOperation {
+        Team team = getTeamByIdOrError(teamId);
+        Project project = projectRepository.findById(projectId).orElseThrow();
+
+        if (!team.getProjects().remove(project)) {
+            throw new InvalidOperation("Cannot remove project id:" + projectId + " from team id:" + teamId + " - Project does not belong to Team");
+        } else {
+            saveTeamToDatabase(team);
+            projectRepository.delete(project);
+        }
+
+    }
+
     private void saveTeamToDatabase(Team team) {
         teamRepository.save(team);
     }
-
 }
