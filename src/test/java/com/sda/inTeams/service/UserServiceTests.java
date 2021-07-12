@@ -31,8 +31,8 @@ public class UserServiceTests {
         this.userRepository = userRepository;
         this.teamRepository = teamRepository;
         this.projectRepository = projectRepository;
-        this.teamService = new TeamService(teamRepository, userRepository,projectRepository);
-        this.userService = new UserService(userRepository,teamRepository);
+        this.teamService = new TeamService(teamRepository, userRepository, projectRepository);
+        this.userService = new UserService(userRepository, teamRepository);
     }
 
     @Test

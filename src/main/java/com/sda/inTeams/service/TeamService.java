@@ -42,17 +42,10 @@ public class TeamService {
 
     public void removeTeam(long teamId) throws InvalidOperation {
         Team team = getTeamByIdOrError(teamId);
-        List<User> teamMembers = userRepository.findAllByTeamsContaining(team);
-        projectRepository.deleteAllByProjectOwner(team);
-        for (User member : teamMembers) {
-            Set<Team> teamsContaining = teamRepository.findAllByMembersContaining(member);
-            for (Team teamCon : teamsContaining) {
-                teamCon.getMembers().remove(member);
-                teamRepository.saveAll(teamsContaining);
-            }
-        }
-        userRepository.saveAll(teamMembers);
+        team.setProjects(new HashSet<>());
         team.setTeamOwner(null);
+        team.setMembers(new HashSet<>());
+        saveTeamToDatabase(team);
         teamRepository.delete(team);
     }
 
@@ -129,7 +122,7 @@ public class TeamService {
         }
     }
 
-    public void removeProject(long teamId, long projectId) throws InvalidOperation {
+    public void removeProjectFromTeam(long teamId, long projectId) throws InvalidOperation {
         Team team = getTeamByIdOrError(teamId);
         Project project = projectRepository.findById(projectId).orElseThrow();
 

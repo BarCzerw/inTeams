@@ -6,8 +6,8 @@ import com.sda.inTeams.model.Project.Project;
 import com.sda.inTeams.model.Project.ProjectStatus;
 import com.sda.inTeams.model.Team.Team;
 import com.sda.inTeams.repository.ProjectRepository;
+import com.sda.inTeams.repository.TaskRepository;
 import com.sda.inTeams.repository.TeamRepository;
-import com.sda.inTeams.repository.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,19 +19,17 @@ import java.util.List;
 @ActiveProfiles("tests")
 public class ProjectServiceTests {
 
-    private final ProjectRepository projectRepository;
     private final ProjectService projectService;
+    private final ProjectRepository projectRepository;
     private final TeamRepository teamRepository;
-    private final TeamService teamService;
-    private final UserRepository userRepository;
+    private final TaskRepository taskRepository;
 
     @Autowired
-    public ProjectServiceTests(ProjectRepository projectRepository, TeamRepository teamRepository, UserRepository userRepository) {
+    public ProjectServiceTests(ProjectRepository projectRepository, TeamRepository teamRepository, TaskRepository taskRepository) {
         this.projectRepository = projectRepository;
         this.teamRepository = teamRepository;
-        this.userRepository = userRepository;
-        this.teamService = new TeamService(teamRepository, userRepository, projectRepository);
-        this.projectService = new ProjectService(projectRepository, teamService);
+        this.taskRepository = taskRepository;
+        this.projectService = new ProjectService(projectRepository, teamRepository, taskRepository);
     }
 
     @Test
@@ -77,9 +75,9 @@ public class ProjectServiceTests {
 
         @Test
         void canGetAllProjectsOfTeam() throws InvalidOperation {
-            Team mainTeam = teamService.getTeamByName("Test Team 001").orElseThrow();
+            Team mainTeam = teamRepository.findByName("Test Team 001").orElseThrow();
             Assertions.assertEquals(1L, projectService.getAllProjectsOfTeam(mainTeam.getId()).size());
-            Team subTeam = teamService.getTeamByName("Test Team 007").orElseThrow();
+            Team subTeam = teamRepository.findByName("Test Team 007").orElseThrow();
             Assertions.assertEquals(0L, projectService.getAllProjectsOfTeam(subTeam.getId()).size());
         }
 
@@ -105,86 +103,54 @@ public class ProjectServiceTests {
     }
 
     @Nested
-    class ProjectManagmentTest {
-
-        private Team MAIN_TEAM = Team.builder().name("Test Team 001").build();
-        private Project MAIN_PROJECT = Project.builder()
-                .name("Test Project 1")
-                .status(ProjectStatus.STARTED)
-                .projectOwner(MAIN_TEAM)
-                .build();
-        private Project SUB_PROJECT = Project.builder()
-                .name("Test Project 2")
-                .status(ProjectStatus.NOT_STARTED)
-                .projectOwner(MAIN_TEAM)
-                .build();
-        private final List<Project> INITIAL_PROJECTS = List.of(MAIN_PROJECT, SUB_PROJECT);
-        private final long INITIAL_PROJECT_COUNT = INITIAL_PROJECTS.size();
+    class ProjectTasksTest {
 
         @BeforeEach
         void setup() {
-            TestUtility.clearDatabase(teamRepository);
-            TestUtility.clearDatabase(projectRepository);
-            TestUtility.assert_databaseSize(teamRepository, 0);
-            TestUtility.assert_databaseSize(projectRepository, 0);
-            TestUtility.addInitialData(teamRepository, List.of(MAIN_TEAM));
-            TestUtility.addInitialData(projectRepository, INITIAL_PROJECTS);
+
         }
 
         @Test
-        void canAddNewValidProjectToTeam() throws InvalidOperation {
-            Team team = teamService.getTeamByName("Test Team 001").orElseThrow();
-            Project newProject = projectRepository.save(Project.builder()
-                    .name("Test Project 7")
-                    .status(ProjectStatus.FINISHED)
-                    .build());
-            teamService.addProjectToTeam(team.getId(), newProject.getId());
-            newProject = projectRepository.findById(newProject.getId()).orElseThrow();
-            team = teamService.getTeamByName("Test Team 001").orElseThrow();
-            List<Project> teamProject = projectRepository.findAllByProjectOwner(team);
-            Assertions.assertEquals(team,newProject.getProjectOwner());
-            Assertions.assertTrue(teamProject.contains(newProject));
+        void canAddTaskToProject() {
+
         }
 
         @Test
-        void cannotAddInvalidProjectToTeam() {
-            Team team = teamService.getTeamByName("Test Team 001").orElseThrow();
-            Assertions.assertThrows(InvalidOperation.class, () -> teamService.addProjectToTeam(team.getId(), -1L));
+        void cannotAddInvalidTaskToProject() {
+
         }
 
         @Test
-        void cannotAddProjectToTeamIfAlreadyAdded() {
-            Team team = teamService.getTeamByName("Test Team 001").orElseThrow();
-            Project newProject = projectRepository.findAllByProjectOwner(team).get(0);
-            Assertions.assertThrows(InvalidOperation.class, () -> teamService.addProjectToTeam(team.getId(), newProject.getId()));
+        void cannotAddTaskToInvalidProject() {
+
         }
 
         @Test
-        void canRemoveProjectFromTeam() throws InvalidOperation {
-            Team team = teamService.getTeamByName("Test Team 001").orElseThrow();
-            List<Project> teamProjects = projectRepository.findAllByProjectOwner(team);
-            long TEAM_PROJECTS_COUNT = teamProjects.size();
-            teamService.removeProject(team.getId(), teamProjects.get(0).getId());
-            teamProjects = projectRepository.findAllByProjectOwner(team);
-            Assertions.assertEquals(TEAM_PROJECTS_COUNT - 1, teamProjects.size());
+        void cannotAddTaskIfAlreadyAdded() {
+
         }
 
         @Test
-        void cannotRemoveProjectFromTeamIfNotOwnedByTeam() {
-            Team team = teamService.getTeamByName("Test Team 001").orElseThrow();
-            Project newProject = projectRepository.save(Project.builder()
-                    .name("Test Project 7")
-                    .status(ProjectStatus.FINISHED)
-                    .build());
-            Project project = projectRepository.save(newProject);
-            Assertions.assertThrows(InvalidOperation.class, () -> teamService.removeProject(team.getId(), project.getId()));
+        void canRemoveTaskFromProject() {
+
+        }
+
+        @Test
+        void cannotRemoveInvalidTaskFromProject() {
+
+        }
+
+        @Test
+        void cannotRemoveTaskIfWrongProjectIdProvided() {
+
         }
 
         @AfterEach
-        void cleanup() throws InvalidOperation {
-            projectRepository.deleteAll();
-            teamRepository.deleteAll();
+        void cleanup() {
+
         }
+
+
     }
 
     @Nested
@@ -198,15 +164,15 @@ public class ProjectServiceTests {
         @BeforeEach
         void setup() {
             TestUtility.clearDatabase(projectRepository);
-            TestUtility.assert_databaseSize(projectRepository,0L);
-            TestUtility.addInitialData(projectRepository,List.of(MAIN_PROJECT));
+            TestUtility.assert_databaseSize(projectRepository, 0L);
+            TestUtility.addInitialData(projectRepository, List.of(MAIN_PROJECT));
         }
 
         @Test
         void canChangeStatusOfProject() throws InvalidOperation {
             ProjectStatus FINAL_STATUS = ProjectStatus.FINISHED;
             Project project = changeStatusTo(FINAL_STATUS);
-            Assertions.assertEquals(FINAL_STATUS,project.getStatus());
+            Assertions.assertEquals(FINAL_STATUS, project.getStatus());
         }
 
         private Project changeStatusTo(ProjectStatus status) throws InvalidOperation {
