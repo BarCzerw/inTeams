@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Projects</title>
+</head>
+<body>
+<table>
+    <tr>
+        <th>No.</th>
+        <th>Name</th>
+        <th>Team</th>
+        <th>Status</th>
+        <th>Show detailed</th>
+        <th>Edit</th>
+        <th>Remove</th>
+    </tr>
+    <tr th:each="prj, index : ${projectList}">
+        <td th:text="${index.index+1}"></td>
+        <td th:text="${prj.getName()}"></td>
+        <td th:text="${prj.getProjectOwner()}"></td>
+        <td th:text="${prj.getStatus()}"></td>
+        <td><a th:href="@{'/project/'+${prj.getId()}}">Details</a></td>
+        <td><a th:href="@{'/project/edit/'+${prj.getId()}}">Edit</a></td>
+        <td><a th:href="@{'/project/delete/'+${prj.getId()}}">Delete</a></td>
+    </tr>
+</table>
+</body>
+</html>
