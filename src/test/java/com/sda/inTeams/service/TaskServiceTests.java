@@ -13,6 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @SpringBootTest
 @ActiveProfiles("tests")
@@ -27,6 +28,10 @@ public class TaskServiceTests {
         this.taskRepository = taskRepository;
         this.projectRepository = projectRepository;
         this.taskService = new TaskService(taskRepository, projectRepository);
+    }
+
+    private Task addNewTaskToDatabase() {
+        return taskRepository.save(Task.builder().status(TaskStatus.WORK_IN_PROGRESS).description("New desc " + new Random().nextInt(100)).build());
     }
 
     @Nested
@@ -78,13 +83,19 @@ public class TaskServiceTests {
         }
 
         @Test
-        void canDeleteTaskByValidId() throws InvalidOperation {
-            taskService.deleteTask(taskService.getAllTasks().get(0).getId());
-            Assertions.assertEquals(INITIAL_DATA_SIZE-1,taskRepository.findAll().size());
+        void canAddNewTask() throws InvalidOperation {
+            taskService.addTask(addNewTaskToDatabase());
+            TestUtility.assert_databaseSize(taskRepository, INITIAL_DATA_SIZE + 1);
         }
 
         @Test
-        void cannotDeleteTaskByInvalidId() throws InvalidOperation {
+        void canDeleteTaskByValidId() throws InvalidOperation {
+            taskService.deleteTask(taskService.getAllTasks().get(0).getId());
+            Assertions.assertEquals(INITIAL_DATA_SIZE - 1, taskRepository.findAll().size());
+        }
+
+        @Test
+        void cannotDeleteTaskByInvalidId() {
             Assertions.assertThrows(InvalidOperation.class, () -> taskService.deleteTask(-1L));
         }
 

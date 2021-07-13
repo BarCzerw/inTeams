@@ -11,7 +11,6 @@ import com.sda.inTeams.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -44,7 +43,7 @@ public class ProjectService {
 
     public Project addProject(Project project) throws InvalidOperation {
         if (!Objects.isNull(project)) {
-            return projectRepository.save(project);
+            return saveProjectToDatabase(project);
         } else {
             throw new InvalidOperation("Cannot add project - Object is null!");
         }
@@ -65,7 +64,7 @@ public class ProjectService {
 
     public void addTaskToProject(long projectId, long taskId) throws InvalidOperation {
         Project project = getProjectByIdOrError(projectId);
-        Task task = taskRepository.findById(taskId).orElseThrow( () -> new InvalidOperation("Task id:" + taskId + " not found!") );
+        Task task = taskRepository.findById(taskId).orElseThrow(() -> new InvalidOperation("Task id:" + taskId + " not found!"));
         if (!project.getTasks().contains(task)) {
             project.getTasks().add(task);
             saveProjectToDatabase(project);
@@ -74,13 +73,13 @@ public class ProjectService {
         }
     }
 
-    public void removeTaskFromProject(long projectId, long taskId) throws InvalidOperation {
+    public Project removeTaskFromProject(long projectId, long taskId) throws InvalidOperation {
         Task taskToRemove = taskRepository.findById(taskId).orElseThrow(() -> new InvalidOperation("Task id:" + taskId + " not found!"));
         Project projectToRemoveFrom = projectRepository.findById(projectId).orElseThrow(() -> new InvalidOperation("Project id:" + projectId + " not found!"));
 
         if (projectToRemoveFrom.getTasks().contains(taskToRemove)) {
             projectToRemoveFrom.getTasks().remove(taskToRemove);
-            saveProjectToDatabase(projectToRemoveFrom);
+            return saveProjectToDatabase(projectToRemoveFrom);
         } else {
             throw new InvalidOperation("Cannot remove task id:" + taskId + " from project id:" + projectId + " - Task is not assigned to this Project!");
         }

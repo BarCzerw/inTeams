@@ -10,7 +10,10 @@ import com.sda.inTeams.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +37,7 @@ public class TeamService {
 
     public Team addTeam(Team team) throws InvalidOperation {
         if (!Objects.isNull(team)) {
-            return teamRepository.save(team);
+            return saveTeamToDatabase(team);
         } else {
             throw new InvalidOperation("Cannot add team - Object is null!");
         }
@@ -79,10 +82,10 @@ public class TeamService {
         Team team = getTeamByIdOrError(teamId);
         User user = getUserByIdOrError(userId);
 
-        if (!isUserOwnerOfTeam(team, user) && isUserMemberOfTeam(team,user)) {
+        if (!isUserOwnerOfTeam(team, user) && isUserMemberOfTeam(team, user)) {
             team.setTeamOwner(user);
             saveTeamToDatabase(team);
-        } else if (!isUserMemberOfTeam(team,user)) {
+        } else if (!isUserMemberOfTeam(team, user)) {
             throw new InvalidOperation("Cannot make user id:" + userId + " owner of team id:" + teamId + " - User is not a team member!");
         } else {
             throw new InvalidOperation("Cannot make user id:" + userId + " owner of team id:" + teamId + " - User is already an owner!");
@@ -135,7 +138,7 @@ public class TeamService {
 
     }
 
-    private void saveTeamToDatabase(Team team) {
-        teamRepository.save(team);
+    private Team saveTeamToDatabase(Team team) {
+        return teamRepository.save(team);
     }
 }

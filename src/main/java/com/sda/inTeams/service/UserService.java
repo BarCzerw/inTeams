@@ -1,14 +1,15 @@
 package com.sda.inTeams.service;
 
 import com.sda.inTeams.exception.InvalidOperation;
-import com.sda.inTeams.model.Team.Team;
 import com.sda.inTeams.model.User.User;
 import com.sda.inTeams.repository.TeamRepository;
 import com.sda.inTeams.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +28,7 @@ public class UserService {
 
     public User addUser(User user) throws InvalidOperation {
         if (!Objects.isNull(user)) {
-            return userRepository.save(user);
+            return saveUserToDatabase(user);
         } else {
             throw new InvalidOperation("Cannot add user - Object is null!");
         }
@@ -45,8 +46,8 @@ public class UserService {
         return userRepository.findById(userId).orElseThrow(() -> new InvalidOperation("User id:" + userId + " not found!"));
     }
 
-    private void saveUserToDatabase(User user) {
-        userRepository.save(user);
+    private User saveUserToDatabase(User user) {
+        return userRepository.save(user);
     }
 
 }

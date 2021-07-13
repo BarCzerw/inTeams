@@ -27,7 +27,7 @@ public class TaskService {
         return taskRepository.findAllByProject(
                 projectRepository.findById(projectId).orElseThrow(
                         () -> new InvalidOperation("Project id:" + projectId + " not found!")
-                        ));
+                ));
     }
 
     public Optional<Task> getTaskById(long taskId) {
@@ -40,7 +40,7 @@ public class TaskService {
 
     public Task addTask(Task task) throws InvalidOperation {
         if (!Objects.isNull(task)) {
-            return taskRepository.save(task);
+            return saveTaskToDatabase(task);
         } else {
             throw new InvalidOperation("Cannot add task - Object is null!");
         }

@@ -4,6 +4,8 @@ import com.sda.inTeams.TestUtility;
 import com.sda.inTeams.exception.InvalidOperation;
 import com.sda.inTeams.model.Project.Project;
 import com.sda.inTeams.model.Project.ProjectStatus;
+import com.sda.inTeams.model.Task.Task;
+import com.sda.inTeams.model.Task.TaskStatus;
 import com.sda.inTeams.model.Team.Team;
 import com.sda.inTeams.repository.ProjectRepository;
 import com.sda.inTeams.repository.TaskRepository;
@@ -14,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
+import java.util.Random;
 
 @SpringBootTest
 @ActiveProfiles("tests")
@@ -37,7 +40,7 @@ public class ProjectServiceTests {
     }
 
     @Nested
-    class ProjectGettingTest {
+    class ProjectGettingTests {
 
         private Team MAIN_TEAM = Team.builder().name("Test Team 001").build();
         private Team SUB_TEAM_ONE = Team.builder().name("Test Team 002").build();
@@ -103,58 +106,122 @@ public class ProjectServiceTests {
     }
 
     @Nested
-    class ProjectTasksTest {
+    class ProjectManagmentTests {
 
         @BeforeEach
         void setup() {
-
+            TestUtility.clearDatabase(projectRepository);
+            TestUtility.assert_databaseSize(projectRepository, 0L);
         }
 
         @Test
-        void canAddTaskToProject() {
-
+        void canAddNewProject() throws InvalidOperation {
+            Project newProject = projectService.addProject(Project.builder().name("New project").status(ProjectStatus.STARTED).build());
+            TestUtility.assert_databaseSize(projectRepository, 1L);
+            Assertions.assertEquals("New Project", newProject.getName());
+            Assertions.assertEquals(ProjectStatus.STARTED, newProject.getStatus());
         }
 
         @Test
-        void cannotAddInvalidTaskToProject() {
-
+        void canRemoveExistingProject() throws InvalidOperation {
+            Project newProject = projectService.addProject(Project.builder().name("New project").status(ProjectStatus.STARTED).build());
+            TestUtility.assert_databaseSize(projectRepository, 1L);
+            projectService.deleteProject(newProject.getId());
+            TestUtility.assert_databaseSize(projectRepository, 0L);
         }
 
         @Test
-        void cannotAddTaskToInvalidProject() {
-
-        }
-
-        @Test
-        void cannotAddTaskIfAlreadyAdded() {
-
-        }
-
-        @Test
-        void canRemoveTaskFromProject() {
-
-        }
-
-        @Test
-        void cannotRemoveInvalidTaskFromProject() {
-
-        }
-
-        @Test
-        void cannotRemoveTaskIfWrongProjectIdProvided() {
-
+        void cannotRemoveProjectIfInvalidId() {
+            Assertions.assertThrows(InvalidOperation.class, () -> projectService.deleteProject(-1L));
         }
 
         @AfterEach
         void cleanup() {
-
+            projectRepository.deleteAll();
         }
-
 
     }
 
     @Nested
-    class ProjectStatusTest {
+    class ProjectTasksTests {
+
+        private final Project INITIAL_PROJECT = Project.builder().name("Test Project 001").status(ProjectStatus.STARTED).build();
+        private Project MAIN_PROJECT;
+        private long MAIN_PROJECT_ID;
+
+        @BeforeEach
+        void setup() {
+            TestUtility.clearDatabase(projectRepository);
+            TestUtility.clearDatabase(taskRepository);
+            TestUtility.assert_databaseSize(projectRepository, 0L);
+            TestUtility.assert_databaseSize(taskRepository, 0L);
+            MAIN_PROJECT = projectRepository.save(INITIAL_PROJECT);
+            MAIN_PROJECT_ID = MAIN_PROJECT.getId();
+        }
+
+        @Test
+        void canAddTaskToProject() throws InvalidOperation {
+            Task newTaskToAdd = addNewTaskToDatabase();
+            projectService.addTaskToProject(MAIN_PROJECT.getId(), newTaskToAdd.getId());
+            MAIN_PROJECT = projectService.getProjectByIdOrError(MAIN_PROJECT_ID);
+            Assertions.assertTrue(taskRepository.findAllByProject(MAIN_PROJECT).contains(newTaskToAdd));
+        }
+
+        @Test
+        void cannotAddInvalidTaskToProject() {
+            Assertions.assertThrows(InvalidOperation.class, () -> projectService.addTaskToProject(MAIN_PROJECT_ID, -1L));
+        }
+
+        @Test
+        void cannotAddTaskToInvalidProject() {
+            Task newTaskToAdd = addNewTaskToDatabase();
+            Assertions.assertThrows(InvalidOperation.class, () -> projectService.addTaskToProject(-1L, newTaskToAdd.getId()));
+        }
+
+        @Test
+        void cannotAddTaskIfAlreadyAdded() throws InvalidOperation {
+            Task newTaskToAdd = addNewTaskToDatabase();
+            projectService.addTaskToProject(MAIN_PROJECT_ID, newTaskToAdd.getId());
+            MAIN_PROJECT = projectService.getProjectByIdOrError(MAIN_PROJECT_ID);
+            Assertions.assertTrue(taskRepository.findAllByProject(MAIN_PROJECT).contains(newTaskToAdd));
+            Assertions.assertThrows(InvalidOperation.class, () -> projectService.addTaskToProject(MAIN_PROJECT_ID, newTaskToAdd.getId()));
+        }
+
+        @Test
+        void canRemoveTaskFromProject() throws InvalidOperation {
+            Task newTaskToAdd = addNewTaskToDatabase();
+            projectService.addTaskToProject(MAIN_PROJECT_ID, newTaskToAdd.getId());
+            MAIN_PROJECT = projectService.getProjectByIdOrError(MAIN_PROJECT_ID);
+            Assertions.assertTrue(taskRepository.findAllByProject(MAIN_PROJECT).contains(newTaskToAdd));
+            projectService.removeTaskFromProject(MAIN_PROJECT_ID, newTaskToAdd.getId());
+            Assertions.assertFalse(taskRepository.findAllByProject(MAIN_PROJECT).contains(newTaskToAdd));
+        }
+
+        @Test
+        void cannotRemoveTaskFromProjectIfTaskDoesNotExist() {
+            Assertions.assertThrows(InvalidOperation.class, () -> projectService.removeTaskFromProject(MAIN_PROJECT_ID, -1L));
+        }
+
+        @Test
+        void cannotRemoveTaskFromProjectIfProjectDoesNotContainTask() {
+            Task anotherTask = addNewTaskToDatabase();
+            Assertions.assertThrows(InvalidOperation.class, () -> projectService.removeTaskFromProject(MAIN_PROJECT_ID, anotherTask.getId()));
+        }
+
+        @AfterEach
+        void cleanup() {
+            projectRepository.deleteAll();
+            taskRepository.deleteAll();
+        }
+
+        private Task addNewTaskToDatabase() {
+            return taskRepository.save(Task.builder().status(TaskStatus.WORK_IN_PROGRESS).description("New desc " + new Random().nextInt(100)).build());
+        }
+
+    }
+
+    @Nested
+    class ProjectStatusTests {
 
         private Project MAIN_PROJECT = Project.builder()
                 .name("Test Project 1")
