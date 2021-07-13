@@ -4,6 +4,7 @@ import com.sda.inTeams.TestUtility;
 import com.sda.inTeams.exception.InvalidOperation;
 import com.sda.inTeams.model.Team.Team;
 import com.sda.inTeams.model.User.User;
+import com.sda.inTeams.repository.ProjectRepository;
 import com.sda.inTeams.repository.TeamRepository;
 import com.sda.inTeams.repository.UserRepository;
 import org.junit.jupiter.api.*;
@@ -23,13 +24,15 @@ public class UserServiceTests {
     private final TeamService teamService;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final ProjectRepository projectRepository;
 
     @Autowired
-    public UserServiceTests(UserRepository userRepository, TeamRepository teamRepository) {
+    public UserServiceTests(UserRepository userRepository, TeamRepository teamRepository, ProjectRepository projectRepository) {
         this.userRepository = userRepository;
         this.teamRepository = teamRepository;
-        this.teamService = new TeamService(teamRepository, userRepository);
-        this.userService = new UserService(userRepository,teamRepository);
+        this.projectRepository = projectRepository;
+        this.teamService = new TeamService(teamRepository, userRepository, projectRepository);
+        this.userService = new UserService(userRepository, teamRepository);
     }
 
     @Test
@@ -60,19 +63,19 @@ public class UserServiceTests {
 
         @AfterEach
         void cleanup() throws InvalidOperation {
-            for (Team team : teamService.getAllTeams()) {
-                teamService.removeTeam(team.getId());
+            for (Team team : teamService.getAll()) {
+                teamService.delete(team.getId());
             }
             teamRepository.flush();
-            for (User user : userService.getAllUsers()) {
-                userService.removeUser(user.getId());
+            for (User user : userService.getAll()) {
+                userService.delete(user.getId());
             }
             userRepository.flush();
         }
 
         @Test
         void canGetAllUsers() {
-            Assertions.assertEquals(INITIAL_USERS_SIZE, userService.getAllUsers().size());
+            Assertions.assertEquals(INITIAL_USERS_SIZE, userService.getAll().size());
         }
 
         @Test
@@ -88,7 +91,7 @@ public class UserServiceTests {
         @Test
         void canAddValidUser() {
             try {
-                userService.addUser(
+                userService.add(
                         User.builder()
                                 .firstName("Bartłomiej")
                                 .lastName("Adamowicz")
@@ -102,14 +105,14 @@ public class UserServiceTests {
 
         @Test
         void cannotAddInvalidUser() {
-            Assertions.assertThrows(InvalidOperation.class, () -> userService.addUser(null));
+            Assertions.assertThrows(InvalidOperation.class, () -> userService.add(null));
         }
 
         @Test
         void canRemoveValidUserNotAnOwnerOfTeam() {
             teamRepository.save(INITIAL_TEAM);
             try {
-                userService.removeUser(userRepository.findByFirstNameAndLastName("Adam", "Mickiewicz").orElseThrow().getId());
+                userService.delete(userRepository.findByFirstNameAndLastName("Adam", "Mickiewicz").orElseThrow().getId());
             } catch (InvalidOperation invalidOperation) {
                 invalidOperation.printStackTrace();
             }
@@ -121,19 +124,19 @@ public class UserServiceTests {
             User user = userRepository.findByFirstNameAndLastName("Jan", "Kowalski").orElseThrow();
             INITIAL_TEAM.setTeamOwner(user);
             teamRepository.save(INITIAL_TEAM);
-            Assertions.assertThrows(InvalidOperation.class, () -> userService.removeUser(user.getId()));
+            Assertions.assertThrows(InvalidOperation.class, () -> userService.delete(user.getId()));
             TestUtility.assert_databaseSize(userRepository, INITIAL_USERS_SIZE);
         }
 
         @Test
         void cannotRemoveInvalidUser() {
-            Assertions.assertThrows(InvalidOperation.class, () -> userService.removeUser(-1L));
+            Assertions.assertThrows(InvalidOperation.class, () -> userService.delete(-1L));
             TestUtility.assert_databaseSize(userRepository, INITIAL_USERS_SIZE);
         }
 
 
         private void assert_gettingUserById(long id, boolean expectedValue) {
-            Optional<User> userOptional = userService.getUserById(id);
+            Optional<User> userOptional = userService.getById(id);
             Assertions.assertEquals(expectedValue, userOptional.isPresent());
         }
 

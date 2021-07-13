@@ -2,8 +2,11 @@ package com.sda.inTeams.service;
 
 import com.sda.inTeams.TestUtility;
 import com.sda.inTeams.exception.InvalidOperation;
+import com.sda.inTeams.model.Project.Project;
+import com.sda.inTeams.model.Project.ProjectStatus;
 import com.sda.inTeams.model.Team.Team;
 import com.sda.inTeams.model.User.User;
+import com.sda.inTeams.repository.ProjectRepository;
 import com.sda.inTeams.repository.TeamRepository;
 import com.sda.inTeams.repository.UserRepository;
 import org.junit.jupiter.api.*;
@@ -20,17 +23,17 @@ import java.util.Optional;
 @ActiveProfiles("tests")
 public class TeamServiceTests {
 
+    private final TeamService teamService;
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
-    private final TeamService teamService;
-    private final UserService userService;
+    private final ProjectRepository projectRepository;
 
     @Autowired
-    public TeamServiceTests(TeamRepository teamRepository, TeamService teamService, UserRepository userRepository) {
+    public TeamServiceTests(TeamRepository teamRepository, UserRepository userRepository, ProjectRepository projectRepository) {
         this.teamRepository = teamRepository;
         this.userRepository = userRepository;
-        this.teamService = new TeamService(teamRepository, userRepository);
-        this.userService = new UserService(userRepository, teamRepository);
+        this.projectRepository = projectRepository;
+        this.teamService = new TeamService(teamRepository, userRepository,projectRepository);
     }
 
     @Test
@@ -62,7 +65,7 @@ public class TeamServiceTests {
 
         @Test
         void canGetAllTeams() {
-            Assertions.assertEquals(INITIAL_TEAMS_SIZE, teamService.getAllTeams().size());
+            Assertions.assertEquals(INITIAL_TEAMS_SIZE, teamService.getAll().size());
         }
 
         @Test
@@ -88,7 +91,7 @@ public class TeamServiceTests {
         @Test
         void canAddValidTeam() {
             try {
-                teamService.addTeam(
+                teamService.add(
                         Team.builder()
                                 .name("New Test Team 001")
                                 .build());
@@ -100,14 +103,14 @@ public class TeamServiceTests {
 
         @Test
         void cannotAddInvalidTeam() {
-            Assertions.assertThrows(InvalidOperation.class, () -> teamService.addTeam(null));
+            Assertions.assertThrows(InvalidOperation.class, () -> teamService.add(null));
             TestUtility.assert_databaseSize(teamRepository, INITIAL_TEAMS_SIZE);
         }
 
         @Test
         void canRemoveValidTeam() {
             try {
-                teamService.removeTeam(TestUtility.getValidObjectId(teamRepository));
+                teamService.delete(TestUtility.getValidObjectId(teamRepository));
             } catch (InvalidOperation invalidOperation) {
                 invalidOperation.printStackTrace();
             }
@@ -119,7 +122,7 @@ public class TeamServiceTests {
             Team team = teamService.getTeamByName("Test Team 001").orElseThrow();
             User user = userRepository.save(TEAM_MEMBER);
             teamService.addUserToTeam(team.getId(), user.getId());
-            teamService.removeTeam(team.getId());
+            teamService.delete(team.getId());
         }
 
         @Test
@@ -130,17 +133,17 @@ public class TeamServiceTests {
             teamService.addUserToTeam(team.getId(), user.getId());
             teamService.addUserToTeam(team.getId(), owner.getId());
             teamService.setOwnerOfTeam(team.getId(), owner.getId());
-            teamService.removeTeam(team.getId());
+            teamService.delete(team.getId());
         }
 
         @Test
         void cannotRemoveInvalidTeam() {
-            Assertions.assertThrows(InvalidOperation.class, () -> teamService.removeTeam(-1L));
+            Assertions.assertThrows(InvalidOperation.class, () -> teamService.delete(-1L));
             TestUtility.assert_databaseSize(teamRepository, INITIAL_TEAMS_SIZE);
         }
 
         private void assert_gettingTeamById(long id, boolean expectedValue) {
-            Optional<Team> teamOptional = teamService.getTeamById(id);
+            Optional<Team> teamOptional = teamService.getById(id);
             Assertions.assertEquals(expectedValue, teamOptional.isPresent());
         }
 
@@ -161,13 +164,11 @@ public class TeamServiceTests {
 
         @AfterEach
         void cleanUp() throws InvalidOperation {
-            for (Team team : teamService.getAllTeams()) {
-                teamService.removeTeam(team.getId());
+            for (Team team : teamService.getAll()) {
+                teamService.delete(team.getId());
             }
             teamRepository.flush();
-            for (User user : userService.getAllUsers()) {
-                userService.removeUser(user.getId());
-            }
+            userRepository.deleteAll();
             userRepository.flush();
         }
 
@@ -230,6 +231,89 @@ public class TeamServiceTests {
             Assertions.assertEquals(expectedValue,teamRepository.findAll().get(0).getMembers().size());
         }
 
+    }
+
+    @Nested
+    class TeamProjectsManagmentTest {
+
+        private Team MAIN_TEAM = Team.builder().name("Test Team 001").build();
+        private Project MAIN_PROJECT = Project.builder()
+                .name("Test Project 1")
+                .status(ProjectStatus.STARTED)
+                .projectOwner(MAIN_TEAM)
+                .build();
+        private Project SUB_PROJECT = Project.builder()
+                .name("Test Project 2")
+                .status(ProjectStatus.NOT_STARTED)
+                .projectOwner(MAIN_TEAM)
+                .build();
+        private final List<Project> INITIAL_PROJECTS = List.of(MAIN_PROJECT, SUB_PROJECT);
+        private final long INITIAL_PROJECT_COUNT = INITIAL_PROJECTS.size();
+
+        @BeforeEach
+        void setup() {
+            TestUtility.clearDatabase(teamRepository);
+            TestUtility.clearDatabase(projectRepository);
+            TestUtility.assert_databaseSize(teamRepository, 0);
+            TestUtility.assert_databaseSize(projectRepository, 0);
+            TestUtility.addInitialData(teamRepository, List.of(MAIN_TEAM));
+            TestUtility.addInitialData(projectRepository, INITIAL_PROJECTS);
+        }
+
+        @Test
+        void canAddNewValidProjectToTeam() throws InvalidOperation {
+            Team team = teamRepository.findByName("Test Team 001").orElseThrow();
+            Project newProject = projectRepository.save(Project.builder()
+                    .name("Test Project 7")
+                    .status(ProjectStatus.FINISHED)
+                    .build());
+            teamService.addProjectToTeam(team.getId(), newProject.getId());
+            newProject = projectRepository.findById(newProject.getId()).orElseThrow();
+            team = teamService.getTeamByName("Test Team 001").orElseThrow();
+            List<Project> teamProject = projectRepository.findAllByProjectOwner(team);
+            Assertions.assertEquals(team,newProject.getProjectOwner());
+            Assertions.assertTrue(teamProject.contains(newProject));
+        }
+
+        @Test
+        void cannotAddInvalidProjectToTeam() {
+            Team team = teamService.getTeamByName("Test Team 001").orElseThrow();
+            Assertions.assertThrows(InvalidOperation.class, () -> teamService.addProjectToTeam(team.getId(), -1L));
+        }
+
+        @Test
+        void cannotAddProjectToTeamIfAlreadyAdded() {
+            Team team = teamService.getTeamByName("Test Team 001").orElseThrow();
+            Project newProject = projectRepository.findAllByProjectOwner(team).get(0);
+            Assertions.assertThrows(InvalidOperation.class, () -> teamService.addProjectToTeam(team.getId(), newProject.getId()));
+        }
+
+        @Test
+        void canRemoveProjectFromTeam() throws InvalidOperation {
+            Team team = teamService.getTeamByName("Test Team 001").orElseThrow();
+            List<Project> teamProjects = projectRepository.findAllByProjectOwner(team);
+            long TEAM_PROJECTS_COUNT = teamProjects.size();
+            teamService.removeProjectFromTeam(team.getId(), teamProjects.get(0).getId());
+            teamProjects = projectRepository.findAllByProjectOwner(team);
+            Assertions.assertEquals(TEAM_PROJECTS_COUNT - 1, teamProjects.size());
+        }
+
+        @Test
+        void cannotRemoveProjectFromTeamIfNotOwnedByTeam() {
+            Team team = teamService.getTeamByName("Test Team 001").orElseThrow();
+            Project newProject = projectRepository.save(Project.builder()
+                    .name("Test Project 7")
+                    .status(ProjectStatus.FINISHED)
+                    .build());
+            Project project = projectRepository.save(newProject);
+            Assertions.assertThrows(InvalidOperation.class, () -> teamService.removeProjectFromTeam(team.getId(), project.getId()));
+        }
+
+        @AfterEach
+        void cleanup() throws InvalidOperation {
+            projectRepository.deleteAll();
+            teamRepository.deleteAll();
+        }
     }
 
 }
