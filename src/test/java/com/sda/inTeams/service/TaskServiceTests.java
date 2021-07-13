@@ -68,35 +68,35 @@ public class TaskServiceTests {
 
         @Test
         void canGetListOfAllTasks() {
-            Assertions.assertEquals(INITIAL_DATA_SIZE, taskService.getAllTasks().size());
+            Assertions.assertEquals(INITIAL_DATA_SIZE, taskService.getAll().size());
         }
 
         @Test
         void canGetTaskOfValidId() throws InvalidOperation {
             Task newTask = taskRepository.save(Task.builder().build());
-            Assertions.assertEquals(newTask, taskService.getTaskByIdOrError(newTask.getId()));
+            Assertions.assertEquals(newTask, taskService.getByIdOrThrow(newTask.getId()));
         }
 
         @Test
         void cannotGetTaskOfInvalidId() {
-            Assertions.assertThrows(InvalidOperation.class, () -> taskService.getTaskByIdOrError(-1L));
+            Assertions.assertThrows(InvalidOperation.class, () -> taskService.getByIdOrThrow(-1L));
         }
 
         @Test
         void canAddNewTask() throws InvalidOperation {
-            taskService.addTask(addNewTaskToDatabase());
+            taskService.add(addNewTaskToDatabase());
             TestUtility.assert_databaseSize(taskRepository, INITIAL_DATA_SIZE + 1);
         }
 
         @Test
         void canDeleteTaskByValidId() throws InvalidOperation {
-            taskService.deleteTask(taskService.getAllTasks().get(0).getId());
+            taskService.delete(taskService.getAll().get(0).getId());
             Assertions.assertEquals(INITIAL_DATA_SIZE - 1, taskRepository.findAll().size());
         }
 
         @Test
         void cannotDeleteTaskByInvalidId() {
-            Assertions.assertThrows(InvalidOperation.class, () -> taskService.deleteTask(-1L));
+            Assertions.assertThrows(InvalidOperation.class, () -> taskService.delete(-1L));
         }
 
         @AfterEach

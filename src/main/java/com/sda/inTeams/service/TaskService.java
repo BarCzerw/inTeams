@@ -14,12 +14,12 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class TaskService {
+public class TaskService implements DatabaseManageable<Task> {
 
     private final TaskRepository taskRepository;
     private final ProjectRepository projectRepository;
 
-    public List<Task> getAllTasks() {
+    public List<Task> getAll() {
         return taskRepository.findAll();
     }
 
@@ -30,36 +30,36 @@ public class TaskService {
                 ));
     }
 
-    public Optional<Task> getTaskById(long taskId) {
+    public Optional<Task> getById(long taskId) {
         return taskRepository.findById(taskId);
     }
 
-    public Task getTaskByIdOrError(long taskId) throws InvalidOperation {
-        return getTaskById(taskId).orElseThrow(() -> new InvalidOperation("Task id:" + taskId + " not found!"));
+    public Task getByIdOrThrow(long taskId) throws InvalidOperation {
+        return getById(taskId).orElseThrow(() -> new InvalidOperation("Task id:" + taskId + " not found!"));
     }
 
-    public Task addTask(Task task) throws InvalidOperation {
+    public Task add(Task task) throws InvalidOperation {
         if (!Objects.isNull(task)) {
-            return saveTaskToDatabase(task);
+            return saveToDatabase(task);
         } else {
             throw new InvalidOperation("Cannot add task - Object is null!");
         }
     }
 
-    public void deleteTask(long taskId) throws InvalidOperation {
-        Task taskToDelete = getTaskByIdOrError(taskId);
+    public void delete(long taskId) throws InvalidOperation {
+        Task taskToDelete = getByIdOrThrow(taskId);
         taskToDelete.setProject(null);
-        taskToDelete = saveTaskToDatabase(taskToDelete);
+        taskToDelete = saveToDatabase(taskToDelete);
         taskRepository.delete(taskToDelete);
     }
 
     public void changeTaskStatus(long taskId, TaskStatus status) throws InvalidOperation {
-        Task task = getTaskByIdOrError(taskId);
+        Task task = getByIdOrThrow(taskId);
         task.setStatus(status);
-        saveTaskToDatabase(task);
+        saveToDatabase(task);
     }
 
-    private Task saveTaskToDatabase(Task task) {
+    public Task saveToDatabase(Task task) {
         return taskRepository.save(task);
     }
 

@@ -65,7 +65,7 @@ public class TeamServiceTests {
 
         @Test
         void canGetAllTeams() {
-            Assertions.assertEquals(INITIAL_TEAMS_SIZE, teamService.getAllTeams().size());
+            Assertions.assertEquals(INITIAL_TEAMS_SIZE, teamService.getAll().size());
         }
 
         @Test
@@ -91,7 +91,7 @@ public class TeamServiceTests {
         @Test
         void canAddValidTeam() {
             try {
-                teamService.addTeam(
+                teamService.add(
                         Team.builder()
                                 .name("New Test Team 001")
                                 .build());
@@ -103,14 +103,14 @@ public class TeamServiceTests {
 
         @Test
         void cannotAddInvalidTeam() {
-            Assertions.assertThrows(InvalidOperation.class, () -> teamService.addTeam(null));
+            Assertions.assertThrows(InvalidOperation.class, () -> teamService.add(null));
             TestUtility.assert_databaseSize(teamRepository, INITIAL_TEAMS_SIZE);
         }
 
         @Test
         void canRemoveValidTeam() {
             try {
-                teamService.removeTeam(TestUtility.getValidObjectId(teamRepository));
+                teamService.delete(TestUtility.getValidObjectId(teamRepository));
             } catch (InvalidOperation invalidOperation) {
                 invalidOperation.printStackTrace();
             }
@@ -122,7 +122,7 @@ public class TeamServiceTests {
             Team team = teamService.getTeamByName("Test Team 001").orElseThrow();
             User user = userRepository.save(TEAM_MEMBER);
             teamService.addUserToTeam(team.getId(), user.getId());
-            teamService.removeTeam(team.getId());
+            teamService.delete(team.getId());
         }
 
         @Test
@@ -133,17 +133,17 @@ public class TeamServiceTests {
             teamService.addUserToTeam(team.getId(), user.getId());
             teamService.addUserToTeam(team.getId(), owner.getId());
             teamService.setOwnerOfTeam(team.getId(), owner.getId());
-            teamService.removeTeam(team.getId());
+            teamService.delete(team.getId());
         }
 
         @Test
         void cannotRemoveInvalidTeam() {
-            Assertions.assertThrows(InvalidOperation.class, () -> teamService.removeTeam(-1L));
+            Assertions.assertThrows(InvalidOperation.class, () -> teamService.delete(-1L));
             TestUtility.assert_databaseSize(teamRepository, INITIAL_TEAMS_SIZE);
         }
 
         private void assert_gettingTeamById(long id, boolean expectedValue) {
-            Optional<Team> teamOptional = teamService.getTeamById(id);
+            Optional<Team> teamOptional = teamService.getById(id);
             Assertions.assertEquals(expectedValue, teamOptional.isPresent());
         }
 
@@ -164,8 +164,8 @@ public class TeamServiceTests {
 
         @AfterEach
         void cleanUp() throws InvalidOperation {
-            for (Team team : teamService.getAllTeams()) {
-                teamService.removeTeam(team.getId());
+            for (Team team : teamService.getAll()) {
+                teamService.delete(team.getId());
             }
             teamRepository.flush();
             userRepository.deleteAll();

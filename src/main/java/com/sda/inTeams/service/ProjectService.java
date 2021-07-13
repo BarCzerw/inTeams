@@ -17,13 +17,13 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class ProjectService {
+public class ProjectService implements DatabaseManageable<Project> {
 
     private final ProjectRepository projectRepository;
     private final TeamRepository teamRepository;
     private final TaskRepository taskRepository;
 
-    public List<Project> getAllProjects() {
+    public List<Project> getAll() {
         return projectRepository.findAll();
     }
 
@@ -32,42 +32,42 @@ public class ProjectService {
         return projectRepository.findAllByProjectOwner(team);
     }
 
-    public Optional<Project> getProjectById(long projectId) {
+    public Optional<Project> getById(long projectId) {
         return projectRepository.findById(projectId);
     }
 
-    public Project getProjectByIdOrError(long projectId) throws InvalidOperation {
-        return getProjectById(projectId).orElseThrow(
+    public Project getByIdOrThrow(long projectId) throws InvalidOperation {
+        return getById(projectId).orElseThrow(
                 () -> new InvalidOperation("Project id:" + projectId + " not found!"));
     }
 
-    public Project addProject(Project project) throws InvalidOperation {
+    public Project add(Project project) throws InvalidOperation {
         if (!Objects.isNull(project)) {
-            return saveProjectToDatabase(project);
+            return saveToDatabase(project);
         } else {
             throw new InvalidOperation("Cannot add project - Object is null!");
         }
     }
 
-    public void deleteProject(long projectId) throws InvalidOperation {
+    public void delete(long projectId) throws InvalidOperation {
         Project projectToDelete = projectRepository.findById(projectId).orElseThrow(() -> new InvalidOperation("Task id:" + projectId + " not found!"));
         projectToDelete.setProjectOwner(null);
-        projectToDelete = saveProjectToDatabase(projectToDelete);
+        projectToDelete = saveToDatabase(projectToDelete);
         projectRepository.delete(projectToDelete);
     }
 
     public Project changeStatus(long projectId, ProjectStatus status) throws InvalidOperation {
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new InvalidOperation("Project id:" + projectId + " not found!"));
         project.setStatus(status);
-        return saveProjectToDatabase(project);
+        return saveToDatabase(project);
     }
 
     public void addTaskToProject(long projectId, long taskId) throws InvalidOperation {
-        Project project = getProjectByIdOrError(projectId);
+        Project project = getByIdOrThrow(projectId);
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new InvalidOperation("Task id:" + taskId + " not found!"));
         if (!project.getTasks().contains(task)) {
             project.getTasks().add(task);
-            saveProjectToDatabase(project);
+            saveToDatabase(project);
         } else {
             throw new InvalidOperation("Cannot add task id:" + taskId + " to project id:" + projectId + " - Task already assigned to this Project");
         }
@@ -79,14 +79,15 @@ public class ProjectService {
 
         if (projectToRemoveFrom.getTasks().contains(taskToRemove)) {
             projectToRemoveFrom.getTasks().remove(taskToRemove);
-            return saveProjectToDatabase(projectToRemoveFrom);
+            return saveToDatabase(projectToRemoveFrom);
         } else {
             throw new InvalidOperation("Cannot remove task id:" + taskId + " from project id:" + projectId + " - Task is not assigned to this Project!");
         }
 
     }
 
-    private Project saveProjectToDatabase(Project project) {
+    public Project saveToDatabase(Project project) {
         return projectRepository.save(project);
     }
+
 }

@@ -73,7 +73,7 @@ public class ProjectServiceTests {
 
         @Test
         void canGetAllProjects() {
-            Assertions.assertEquals(2, projectService.getAllProjects().size());
+            Assertions.assertEquals(2, projectService.getAll().size());
         }
 
         @Test
@@ -87,14 +87,14 @@ public class ProjectServiceTests {
         @Test
         void canGetProjectByValidId() throws InvalidOperation {
             Project project = projectRepository.findAll().get(0);
-            Project expected = projectService.getProjectByIdOrError(project.getId());
+            Project expected = projectService.getByIdOrThrow(project.getId());
             Assertions.assertEquals(expected, project);
         }
 
         @Test
         void cannotGetProjectByInvalidId() throws InvalidOperation {
             Assertions.assertThrows(InvalidOperation.class,
-                    () -> projectService.getProjectByIdOrError(-1L));
+                    () -> projectService.getByIdOrThrow(-1L));
         }
 
         @AfterEach
@@ -116,7 +116,7 @@ public class ProjectServiceTests {
 
         @Test
         void canAddNewProject() throws InvalidOperation {
-            Project newProject = projectService.addProject(Project.builder().name("New project").status(ProjectStatus.STARTED).build());
+            Project newProject = projectService.add(Project.builder().name("New project").status(ProjectStatus.STARTED).build());
             TestUtility.assert_databaseSize(projectRepository, 1L);
             Assertions.assertEquals("New Project", newProject.getName());
             Assertions.assertEquals(ProjectStatus.STARTED, newProject.getStatus());
@@ -124,15 +124,15 @@ public class ProjectServiceTests {
 
         @Test
         void canRemoveExistingProject() throws InvalidOperation {
-            Project newProject = projectService.addProject(Project.builder().name("New project").status(ProjectStatus.STARTED).build());
+            Project newProject = projectService.add(Project.builder().name("New project").status(ProjectStatus.STARTED).build());
             TestUtility.assert_databaseSize(projectRepository, 1L);
-            projectService.deleteProject(newProject.getId());
+            projectService.delete(newProject.getId());
             TestUtility.assert_databaseSize(projectRepository, 0L);
         }
 
         @Test
         void cannotRemoveProjectIfInvalidId() {
-            Assertions.assertThrows(InvalidOperation.class, () -> projectService.deleteProject(-1L));
+            Assertions.assertThrows(InvalidOperation.class, () -> projectService.delete(-1L));
         }
 
         @AfterEach
@@ -163,7 +163,7 @@ public class ProjectServiceTests {
         void canAddTaskToProject() throws InvalidOperation {
             Task newTaskToAdd = addNewTaskToDatabase();
             projectService.addTaskToProject(MAIN_PROJECT.getId(), newTaskToAdd.getId());
-            MAIN_PROJECT = projectService.getProjectByIdOrError(MAIN_PROJECT_ID);
+            MAIN_PROJECT = projectService.getByIdOrThrow(MAIN_PROJECT_ID);
             Assertions.assertTrue(taskRepository.findAllByProject(MAIN_PROJECT).contains(newTaskToAdd));
         }
 
@@ -182,7 +182,7 @@ public class ProjectServiceTests {
         void cannotAddTaskIfAlreadyAdded() throws InvalidOperation {
             Task newTaskToAdd = addNewTaskToDatabase();
             projectService.addTaskToProject(MAIN_PROJECT_ID, newTaskToAdd.getId());
-            MAIN_PROJECT = projectService.getProjectByIdOrError(MAIN_PROJECT_ID);
+            MAIN_PROJECT = projectService.getByIdOrThrow(MAIN_PROJECT_ID);
             Assertions.assertTrue(taskRepository.findAllByProject(MAIN_PROJECT).contains(newTaskToAdd));
             Assertions.assertThrows(InvalidOperation.class, () -> projectService.addTaskToProject(MAIN_PROJECT_ID, newTaskToAdd.getId()));
         }
@@ -191,7 +191,7 @@ public class ProjectServiceTests {
         void canRemoveTaskFromProject() throws InvalidOperation {
             Task newTaskToAdd = addNewTaskToDatabase();
             projectService.addTaskToProject(MAIN_PROJECT_ID, newTaskToAdd.getId());
-            MAIN_PROJECT = projectService.getProjectByIdOrError(MAIN_PROJECT_ID);
+            MAIN_PROJECT = projectService.getByIdOrThrow(MAIN_PROJECT_ID);
             Assertions.assertTrue(taskRepository.findAllByProject(MAIN_PROJECT).contains(newTaskToAdd));
             projectService.removeTaskFromProject(MAIN_PROJECT_ID, newTaskToAdd.getId());
             Assertions.assertFalse(taskRepository.findAllByProject(MAIN_PROJECT).contains(newTaskToAdd));

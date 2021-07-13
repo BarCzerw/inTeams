@@ -17,17 +17,17 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class TeamService {
+public class TeamService implements DatabaseManageable<Team> {
 
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
 
-    public List<Team> getAllTeams() {
+    public List<Team> getAll() {
         return teamRepository.findAll();
     }
 
-    public Optional<Team> getTeamById(long teamId) {
+    public Optional<Team> getById(long teamId) {
         return teamRepository.findById(teamId);
     }
 
@@ -35,42 +35,42 @@ public class TeamService {
         return teamRepository.findByName(name);
     }
 
-    public Team addTeam(Team team) throws InvalidOperation {
+    public Team add(Team team) throws InvalidOperation {
         if (!Objects.isNull(team)) {
-            return saveTeamToDatabase(team);
+            return saveToDatabase(team);
         } else {
             throw new InvalidOperation("Cannot add team - Object is null!");
         }
     }
 
-    public void removeTeam(long teamId) throws InvalidOperation {
-        Team team = getTeamByIdOrError(teamId);
+    public void delete(long teamId) throws InvalidOperation {
+        Team team = getByIdOrThrow(teamId);
         team.setProjects(new HashSet<>());
         team.setTeamOwner(null);
         team.setMembers(new HashSet<>());
-        saveTeamToDatabase(team);
+        saveToDatabase(team);
         teamRepository.delete(team);
     }
 
     public void addUserToTeam(long teamId, long userId) throws InvalidOperation {
-        Team team = getTeamByIdOrError(teamId);
+        Team team = getByIdOrThrow(teamId);
         User user = getUserByIdOrError(userId);
 
         if (!team.getMembers().contains(user)) {
             team.getMembers().add(user);
-            saveTeamToDatabase(team);
+            saveToDatabase(team);
         } else {
             throw new InvalidOperation("Cannot add user id:" + user.getId() + " to team id:" + team.getId() + " - User is already a member");
         }
     }
 
     public void removeUserFromTeam(long teamId, long userId) throws InvalidOperation {
-        Team team = getTeamByIdOrError(teamId);
+        Team team = getByIdOrThrow(teamId);
         User user = getUserByIdOrError(userId);
 
         if (team.getMembers().contains(user) && !team.getTeamOwner().equals(user)) {
             team.getMembers().remove(user);
-            saveTeamToDatabase(team);
+            saveToDatabase(team);
         } else if (team.getTeamOwner().equals(user)) {
             throw new InvalidOperation("Cannot remove user id:" + userId + " from team id: " + teamId + " - User is an owner!");
         } else {
@@ -79,12 +79,12 @@ public class TeamService {
     }
 
     public void setOwnerOfTeam(long teamId, long userId) throws InvalidOperation {
-        Team team = getTeamByIdOrError(teamId);
+        Team team = getByIdOrThrow(teamId);
         User user = getUserByIdOrError(userId);
 
         if (!isUserOwnerOfTeam(team, user) && isUserMemberOfTeam(team, user)) {
             team.setTeamOwner(user);
-            saveTeamToDatabase(team);
+            saveToDatabase(team);
         } else if (!isUserMemberOfTeam(team, user)) {
             throw new InvalidOperation("Cannot make user id:" + userId + " owner of team id:" + teamId + " - User is not a team member!");
         } else {
@@ -106,16 +106,16 @@ public class TeamService {
                 () -> new InvalidOperation("User id:" + userId + " not found!"));
     }
 
-    public Team getTeamByIdOrError(long teamId) throws InvalidOperation {
+    public Team getByIdOrThrow(long teamId) throws InvalidOperation {
         return teamRepository.findById(teamId).orElseThrow(() -> new InvalidOperation("Team id:" + teamId + " not found!"));
     }
 
     public void addProjectToTeam(long teamId, long projectId) throws InvalidOperation {
-        Team team = getTeamByIdOrError(teamId);
+        Team team = getByIdOrThrow(teamId);
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new InvalidOperation("Project id:" + projectId + " not found!"));
         if (!team.getProjects().contains(project)) {
             team.getProjects().add(project);
-            saveTeamToDatabase(team);
+            saveToDatabase(team);
             project.setProjectOwner(team);
             projectRepository.save(project);
         } else {
@@ -126,19 +126,19 @@ public class TeamService {
     }
 
     public void removeProjectFromTeam(long teamId, long projectId) throws InvalidOperation {
-        Team team = getTeamByIdOrError(teamId);
+        Team team = getByIdOrThrow(teamId);
         Project project = projectRepository.findById(projectId).orElseThrow();
 
         if (!team.getProjects().remove(project)) {
             throw new InvalidOperation("Cannot remove project id:" + projectId + " from team id:" + teamId + " - Project does not belong to Team");
         } else {
-            saveTeamToDatabase(team);
+            saveToDatabase(team);
             projectRepository.delete(project);
         }
 
     }
 
-    private Team saveTeamToDatabase(Team team) {
+    public Team saveToDatabase(Team team) {
         return teamRepository.save(team);
     }
 }
