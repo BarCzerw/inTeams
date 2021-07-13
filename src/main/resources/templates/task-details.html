@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Task details</title>
+</head>
+<body>
+<table th:object="${taskDetails}">
+  <tr>
+    <td>Task Id</td>
+    <td th:text="*{getId()}"></td>
+  </tr>
+  <tr>
+    <td>Description</td>
+    <td th:text="*{getDescription()}"></td>
+  </tr>
+  <tr>
+    <td>Status</td>
+    <td th:text="*{getStatus()}"></td>
+  </tr>
+  <tr>
+    <td>Project (debug info)</td>
+    <td th:text="*{getProject().getId()}"></td>
+  </tr>
+</table>
+</body>
+</html>
