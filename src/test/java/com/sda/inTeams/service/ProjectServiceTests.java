@@ -116,7 +116,7 @@ public class ProjectServiceTests {
 
         @Test
         void canAddNewProject() throws InvalidOperation {
-            Project newProject = projectService.add(Project.builder().name("New project").status(ProjectStatus.STARTED).build());
+            Project newProject = projectService.add(Project.builder().name("New Project").status(ProjectStatus.STARTED).build());
             TestUtility.assert_databaseSize(projectRepository, 1L);
             Assertions.assertEquals("New Project", newProject.getName());
             Assertions.assertEquals(ProjectStatus.STARTED, newProject.getStatus());
@@ -164,6 +164,7 @@ public class ProjectServiceTests {
             Task newTaskToAdd = addNewTaskToDatabase();
             projectService.addTaskToProject(MAIN_PROJECT.getId(), newTaskToAdd.getId());
             MAIN_PROJECT = projectService.getByIdOrThrow(MAIN_PROJECT_ID);
+            newTaskToAdd = taskRepository.getById(newTaskToAdd.getId());
             Assertions.assertTrue(taskRepository.findAllByProject(MAIN_PROJECT).contains(newTaskToAdd));
         }
 
@@ -183,17 +184,21 @@ public class ProjectServiceTests {
             Task newTaskToAdd = addNewTaskToDatabase();
             projectService.addTaskToProject(MAIN_PROJECT_ID, newTaskToAdd.getId());
             MAIN_PROJECT = projectService.getByIdOrThrow(MAIN_PROJECT_ID);
+            newTaskToAdd = taskRepository.getById(newTaskToAdd.getId());
             Assertions.assertTrue(taskRepository.findAllByProject(MAIN_PROJECT).contains(newTaskToAdd));
-            Assertions.assertThrows(InvalidOperation.class, () -> projectService.addTaskToProject(MAIN_PROJECT_ID, newTaskToAdd.getId()));
+            long TASK_ID = newTaskToAdd.getId();
+            Assertions.assertThrows(InvalidOperation.class, () -> projectService.addTaskToProject(MAIN_PROJECT_ID, TASK_ID));
         }
 
         @Test
         void canRemoveTaskFromProject() throws InvalidOperation {
             Task newTaskToAdd = addNewTaskToDatabase();
-            projectService.addTaskToProject(MAIN_PROJECT_ID, newTaskToAdd.getId());
+            long TASK_ID = newTaskToAdd.getId();
+            projectService.addTaskToProject(MAIN_PROJECT_ID, TASK_ID);
             MAIN_PROJECT = projectService.getByIdOrThrow(MAIN_PROJECT_ID);
+            newTaskToAdd = taskRepository.getById(TASK_ID);
             Assertions.assertTrue(taskRepository.findAllByProject(MAIN_PROJECT).contains(newTaskToAdd));
-            projectService.removeTaskFromProject(MAIN_PROJECT_ID, newTaskToAdd.getId());
+            projectService.removeTaskFromProject(MAIN_PROJECT_ID, TASK_ID);
             Assertions.assertFalse(taskRepository.findAllByProject(MAIN_PROJECT).contains(newTaskToAdd));
         }
 

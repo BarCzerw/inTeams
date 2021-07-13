@@ -110,7 +110,6 @@ public class TaskServiceTests {
     class TaskStatusTests {
 
         Task TASK = Task.builder()
-                .id(99)
                 .status(TaskStatus.NOT_STARTED)
                 .description("Desc 99")
                 .build();

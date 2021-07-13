@@ -68,6 +68,8 @@ public class ProjectService implements DatabaseManageable<Project> {
         if (!project.getTasks().contains(task)) {
             project.getTasks().add(task);
             saveToDatabase(project);
+            task.setProject(project);
+            taskRepository.save(task);
         } else {
             throw new InvalidOperation("Cannot add task id:" + taskId + " to project id:" + projectId + " - Task already assigned to this Project");
         }
@@ -78,7 +80,7 @@ public class ProjectService implements DatabaseManageable<Project> {
         Project projectToRemoveFrom = projectRepository.findById(projectId).orElseThrow(() -> new InvalidOperation("Project id:" + projectId + " not found!"));
 
         if (projectToRemoveFrom.getTasks().contains(taskToRemove)) {
-            projectToRemoveFrom.getTasks().remove(taskToRemove);
+            taskRepository.delete(taskToRemove);
             return saveToDatabase(projectToRemoveFrom);
         } else {
             throw new InvalidOperation("Cannot remove task id:" + taskId + " from project id:" + projectId + " - Task is not assigned to this Project!");

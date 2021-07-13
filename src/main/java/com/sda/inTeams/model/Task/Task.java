@@ -4,6 +4,7 @@ import com.sda.inTeams.model.Comment.Comment;
 import com.sda.inTeams.model.Indexable;
 import com.sda.inTeams.model.Project.Project;
 import lombok.*;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -27,7 +28,8 @@ public class Task implements Indexable {
     @ManyToOne
     private Project project;
 
-    @OneToMany(mappedBy = "task")
+    @OneToMany(mappedBy = "task", cascade = CascadeType.REMOVE)
+    @Cascade(value = {org.hibernate.annotations.CascadeType.DELETE})
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Set<Comment> comments;
