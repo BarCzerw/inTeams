@@ -23,5 +23,25 @@
     <td th:text="*{getProject().getId()}"></td>
   </tr>
 </table>
+
+<table>
+  <tr>
+    <th>No.</th>
+    <th>Text</th>
+    <th>Creator</th>
+    <th>Show detailed</th>
+    <th>Edit</th>
+    <th>Remove</th>
+  </tr>
+  <tr th:each="comment, index : ${taskComments}">
+    <td th:text="${index.index+1}"></td>
+    <td th:text="${comment.getText()}"></td>
+    <td th:text="${comment.getCreator()}"></td>
+    <td><a th:href="@{'/comment/'+${comment.getId()}}">Details</a></td>
+    <td><a th:href="@{'/comment/edit/'+${comment.getId()}}">Edit</a></td>
+    <td><a th:href="@{'/comment/delete/'+${comment.getId()}}">Delete</a></td>
+  </tr>
+</table>
+
 </body>
 </html>

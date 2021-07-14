@@ -3,6 +3,7 @@ package com.sda.inTeams.controller;
 import com.sda.inTeams.exception.InvalidOperation;
 import com.sda.inTeams.model.Task.Task;
 import com.sda.inTeams.model.Task.TaskStatus;
+import com.sda.inTeams.service.CommentService;
 import com.sda.inTeams.service.ProjectService;
 import com.sda.inTeams.service.TaskService;
 import com.sda.inTeams.service.TeamService;
@@ -19,6 +20,7 @@ public class TaskController {
     private final TaskService taskService;
     private final TeamService teamService;
     private final ProjectService projectService;
+    private final CommentService commentService;
 
     @GetMapping("/all")
     public String getAllTasks(Model model) {
@@ -40,6 +42,18 @@ public class TaskController {
     public String addTaskForm(Model model) {
         model.addAttribute("newTask", new Task());
         return "task-add-form";
+    }
+
+    @GetMapping("/{id}")
+    public String getTask(Model model, @PathVariable(name = "id") long taskId) {
+        try {
+            model.addAttribute("newTask", taskService.getByIdOrThrow(taskId));
+            model.addAttribute("taskComments", commentService.getAllByTask(taskId));
+            return "task-details";
+        } catch (InvalidOperation invalidOperation) {
+            invalidOperation.printStackTrace();
+            return "task-list";
+        }
     }
 
     @PostMapping("/add")
