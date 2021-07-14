@@ -4,7 +4,6 @@ import com.sda.inTeams.exception.InvalidOperation;
 import com.sda.inTeams.model.Project.Project;
 import com.sda.inTeams.model.Task.Task;
 import com.sda.inTeams.model.Task.TaskStatus;
-import com.sda.inTeams.model.Team.Team;
 import com.sda.inTeams.service.CommentService;
 import com.sda.inTeams.service.ProjectService;
 import com.sda.inTeams.service.TaskService;
@@ -95,11 +94,14 @@ public class TaskController {
     @GetMapping("/delete/{id}")
     public String deleteTask(@PathVariable(name = "id") long taskId) {
         try {
+            Task taskToDelete = taskService.getByIdOrThrow(taskId);
+            long projectId = taskToDelete.getId();
             taskService.delete(taskId);
+            return "redirect:/project/" + projectId;
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
+            return "redirect:/task/all";
         }
-        return "redirect:/task/all";
     }
 
 }

@@ -54,8 +54,11 @@ public class TaskService implements DatabaseManageable<Task> {
         Task taskToDelete = getByIdOrThrow(taskId);
         taskToDelete.setProject(null);
         for (Comment comment : taskToDelete.getComments()) {
-            removeCommentFromTask(taskId,comment.getId());
+            comment.setTask(null);
+            comment = commentRepository.save(comment);
+            commentRepository.delete(comment);
         }
+        taskToDelete.getComments().clear();
         taskToDelete = saveToDatabase(taskToDelete);
         taskRepository.delete(taskToDelete);
     }

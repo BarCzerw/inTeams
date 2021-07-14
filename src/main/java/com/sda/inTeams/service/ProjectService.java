@@ -56,7 +56,9 @@ public class ProjectService implements DatabaseManageable<Project> {
         Project projectToDelete = getByIdOrThrow(projectId);
         projectToDelete.setProjectOwner(null);
         for (Task task : projectToDelete.getTasks()) {
-            taskService.delete(task.getId());
+            task.setProject(null);
+            Task taskToDelete = taskService.saveToDatabase(task);
+            taskService.delete(taskToDelete.getId());
         }
         projectToDelete.setTasks(new HashSet<>());
         projectToDelete = saveToDatabase(projectToDelete);
