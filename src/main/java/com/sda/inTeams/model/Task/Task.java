@@ -28,7 +28,7 @@ public class Task implements Indexable {
     @ManyToOne
     private Project project;
 
-    @OneToMany(mappedBy = "task", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "task", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Set<Comment> comments;

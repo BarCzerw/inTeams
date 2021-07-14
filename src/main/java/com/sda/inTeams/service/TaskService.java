@@ -53,12 +53,12 @@ public class TaskService implements DatabaseManageable<Task> {
     public void delete(long taskId) throws InvalidOperation {
         Task taskToDelete = getByIdOrThrow(taskId);
         taskToDelete.setProject(null);
-        for (Comment comment : taskToDelete.getComments()) {
+        /*for (Comment comment : taskToDelete.getComments()) {
             comment.setTask(null);
             comment = commentRepository.save(comment);
             commentRepository.delete(comment);
         }
-        taskToDelete.getComments().clear();
+        taskToDelete.getComments().clear();*/
         taskToDelete = saveToDatabase(taskToDelete);
         taskRepository.delete(taskToDelete);
     }

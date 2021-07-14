@@ -55,12 +55,12 @@ public class ProjectService implements DatabaseManageable<Project> {
     public void delete(long projectId) throws InvalidOperation {
         Project projectToDelete = getByIdOrThrow(projectId);
         projectToDelete.setProjectOwner(null);
-        for (Task task : projectToDelete.getTasks()) {
+        /*for (Task task : projectToDelete.getTasks()) {
             task.setProject(null);
             Task taskToDelete = taskService.saveToDatabase(task);
             taskService.delete(taskToDelete.getId());
         }
-        projectToDelete.setTasks(new HashSet<>());
+        projectToDelete.setTasks(new HashSet<>());*/
         projectToDelete = saveToDatabase(projectToDelete);
         projectRepository.delete(projectToDelete);
     }
