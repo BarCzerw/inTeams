@@ -9,8 +9,8 @@
     <input type="number" hidden th:field="*{id}">
     <!--<input type="number" hidden th:name="creatorId" th:value="${userId}">-->
     <input type="number" hidden th:name="taskId" th:value="${ownerId}">
-    <label>Name<input type="text" th:field="*{text}"></label>
-    <button type="submit">Add</button>
+    <input type="text" th:field="*{text}" placeholder="Your comment">
+    <button type="submit">Add new comment</button>
 </form>
 </body>
 </html>

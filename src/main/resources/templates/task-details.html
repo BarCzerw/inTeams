@@ -20,8 +20,8 @@
     <td th:text="${taskDetails.getStatus()}"></td>
   </tr>
   <tr>
-    <td>Project (debug info)</td>
-    <td th:text="${taskDetails.getProject().getId()}"></td>
+    <td>Project</td>
+    <td><a th:href="@{'/project/' + ${taskDetails.getProject().getId()}}">Go back to project</a></td>
   </tr>
 </table>
 <h2>Comments</h2>
