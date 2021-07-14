@@ -7,6 +7,7 @@ import com.sda.inTeams.model.Project.ProjectStatus;
 import com.sda.inTeams.model.Task.Task;
 import com.sda.inTeams.model.Task.TaskStatus;
 import com.sda.inTeams.model.Team.Team;
+import com.sda.inTeams.repository.CommentRepository;
 import com.sda.inTeams.repository.ProjectRepository;
 import com.sda.inTeams.repository.TaskRepository;
 import com.sda.inTeams.repository.TeamRepository;
@@ -23,16 +24,20 @@ import java.util.Random;
 public class ProjectServiceTests {
 
     private final ProjectService projectService;
+    private final TaskService taskService;
     private final ProjectRepository projectRepository;
     private final TeamRepository teamRepository;
     private final TaskRepository taskRepository;
+    private final CommentRepository commentRepository;
 
     @Autowired
-    public ProjectServiceTests(ProjectRepository projectRepository, TeamRepository teamRepository, TaskRepository taskRepository) {
+    public ProjectServiceTests(ProjectRepository projectRepository, TeamRepository teamRepository, TaskRepository taskRepository, CommentRepository commentRepository) {
         this.projectRepository = projectRepository;
         this.teamRepository = teamRepository;
         this.taskRepository = taskRepository;
-        this.projectService = new ProjectService(projectRepository, teamRepository, taskRepository);
+        this.commentRepository = commentRepository;
+        this.taskService = new TaskService(taskRepository, projectRepository, commentRepository);
+        this.projectService = new ProjectService(projectRepository, teamRepository, taskRepository,taskService);
     }
 
     @Test

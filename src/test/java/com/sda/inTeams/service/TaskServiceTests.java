@@ -4,6 +4,7 @@ import com.sda.inTeams.TestUtility;
 import com.sda.inTeams.exception.InvalidOperation;
 import com.sda.inTeams.model.Task.Task;
 import com.sda.inTeams.model.Task.TaskStatus;
+import com.sda.inTeams.repository.CommentRepository;
 import com.sda.inTeams.repository.ProjectRepository;
 import com.sda.inTeams.repository.TaskRepository;
 import org.junit.jupiter.api.*;
@@ -22,12 +23,14 @@ public class TaskServiceTests {
     private final TaskService taskService;
     private final TaskRepository taskRepository;
     private final ProjectRepository projectRepository;
+    private final CommentRepository commentRepository;
 
     @Autowired
-    public TaskServiceTests(TaskRepository taskRepository, ProjectRepository projectRepository) {
+    public TaskServiceTests(TaskRepository taskRepository, ProjectRepository projectRepository, CommentRepository commentRepository) {
         this.taskRepository = taskRepository;
         this.projectRepository = projectRepository;
-        this.taskService = new TaskService(taskRepository, projectRepository);
+        this.commentRepository = commentRepository;
+        this.taskService = new TaskService(taskRepository, projectRepository, commentRepository);
     }
 
     private Task addNewTaskToDatabase() {

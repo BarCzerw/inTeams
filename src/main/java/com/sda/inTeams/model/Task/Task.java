@@ -28,8 +28,7 @@ public class Task implements Indexable {
     @ManyToOne
     private Project project;
 
-    @OneToMany(mappedBy = "task", cascade = CascadeType.REMOVE)
-    @Cascade(value = {org.hibernate.annotations.CascadeType.DELETE})
+    @OneToMany(mappedBy = "task", fetch = FetchType.EAGER)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Set<Comment> comments;

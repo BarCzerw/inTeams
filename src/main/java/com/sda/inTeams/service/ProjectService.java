@@ -11,6 +11,7 @@ import com.sda.inTeams.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,6 +23,8 @@ public class ProjectService implements DatabaseManageable<Project> {
     private final ProjectRepository projectRepository;
     private final TeamRepository teamRepository;
     private final TaskRepository taskRepository;
+
+    private final TaskService taskService;
 
     public List<Project> getAll() {
         return projectRepository.findAll();
@@ -50,8 +53,12 @@ public class ProjectService implements DatabaseManageable<Project> {
     }
 
     public void delete(long projectId) throws InvalidOperation {
-        Project projectToDelete = projectRepository.findById(projectId).orElseThrow(() -> new InvalidOperation("Task id:" + projectId + " not found!"));
+        Project projectToDelete = getByIdOrThrow(projectId);
         projectToDelete.setProjectOwner(null);
+        for (Task task : projectToDelete.getTasks()) {
+            taskService.delete(task.getId());
+        }
+        projectToDelete.setTasks(new HashSet<>());
         projectToDelete = saveToDatabase(projectToDelete);
         projectRepository.delete(projectToDelete);
     }

@@ -10,6 +10,7 @@ import com.sda.inTeams.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -52,6 +53,9 @@ public class TaskService implements DatabaseManageable<Task> {
     public void delete(long taskId) throws InvalidOperation {
         Task taskToDelete = getByIdOrThrow(taskId);
         taskToDelete.setProject(null);
+        for (Comment comment : taskToDelete.getComments()) {
+            removeCommentFromTask(taskId,comment.getId());
+        }
         taskToDelete = saveToDatabase(taskToDelete);
         taskRepository.delete(taskToDelete);
     }

@@ -54,11 +54,12 @@ public class ProjectController {
         try {
             //project.setProjectOwner(teamService.getByIdOrThrow(ownerId));
             project.setStatus(ProjectStatus.NOT_STARTED);
-            projectService.add(project);
+            Project addedProject = projectService.add(project);
+            return "redirect:/project/" + addedProject.getId();
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
+            return "redirect:/project/all";
         }
-        return "redirect:/project/all";
     }
 
     @GetMapping("/edit/{id}")

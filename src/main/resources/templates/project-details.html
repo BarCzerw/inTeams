@@ -5,6 +5,7 @@
     <title>Project details</title>
 </head>
 <body>
+<h2>Project</h2>
 <table th:object="${projectDetails}">
   <tr>
     <td>Project Id</td>
@@ -23,6 +24,7 @@
     <td th:text="*{getStatus()}"></td>
   </tr>
 </table>
+<h2>Tasks</h2>
 <table>
   <tr>
     <th>No.</th>
@@ -36,11 +38,11 @@
     <td th:text="${index.index+1}"></td>
     <td th:text="${task.getDescription()}"></td>
     <td th:text="${task.getStatus()}"></td>
-    <td><a th:href="@{'/project/'+${prj.getId()}}">Add</a></td>
-    <td><a th:href="@{'/project/edit/'+${prj.getId()}}">Edit</a></td>
-    <td><a th:href="@{'/project/delete/'+${prj.getId()}}">Delete</a></td>
+    <td><a th:href="@{'/task/'+${task.getId()}}">Show</a></td>
+    <td><a th:href="@{'/task/edit/'+${task.getId()}}">Edit</a></td>
+    <td><a th:href="@{'/task/delete/'+${task.getId()}}">Delete</a></td>
   </tr>
 </table>
-
+<h4><a th:href="@{'/task/add?projectId=' + ${projectDetails.getId()}}">Add new task</a></h4>
 </body>
 </html>

@@ -28,8 +28,7 @@ public class Project implements Indexable {
     @Enumerated(EnumType.STRING)
     private ProjectStatus status;
 
-    @OneToMany(mappedBy = "project", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
-    @Cascade(value = {org.hibernate.annotations.CascadeType.DELETE})
+    @OneToMany(mappedBy = "project", fetch = FetchType.EAGER)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Set<Task> tasks;

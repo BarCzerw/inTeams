@@ -1,8 +1,10 @@
 package com.sda.inTeams.controller;
 
 import com.sda.inTeams.exception.InvalidOperation;
+import com.sda.inTeams.model.Project.Project;
 import com.sda.inTeams.model.Task.Task;
 import com.sda.inTeams.model.Task.TaskStatus;
+import com.sda.inTeams.model.Team.Team;
 import com.sda.inTeams.service.CommentService;
 import com.sda.inTeams.service.ProjectService;
 import com.sda.inTeams.service.TaskService;
@@ -28,26 +30,10 @@ public class TaskController {
         return "task-list";
     }
 
-    @GetMapping()
-    public String getProjectTasks(Model model, @RequestParam(name = "teamId") long teamId) {
-        try {
-            model.addAttribute("taskList", taskService.getAllTasksOfTeam(teamId));
-        } catch (InvalidOperation invalidOperation) {
-            invalidOperation.printStackTrace();
-        }
-        return "task-list";
-    }
-
-    @GetMapping("/add")
-    public String addTaskForm(Model model) {
-        model.addAttribute("newTask", new Task());
-        return "task-add-form";
-    }
-
     @GetMapping("/{id}")
     public String getTask(Model model, @PathVariable(name = "id") long taskId) {
         try {
-            model.addAttribute("newTask", taskService.getByIdOrThrow(taskId));
+            model.addAttribute("taskDetails", taskService.getByIdOrThrow(taskId));
             model.addAttribute("taskComments", commentService.getAllByTask(taskId));
             return "task-details";
         } catch (InvalidOperation invalidOperation) {
@@ -56,23 +42,49 @@ public class TaskController {
         }
     }
 
-    @PostMapping("/add")
-    public String addTask(Task task) {
-        //long projectId
+    @GetMapping("/team")
+    public String getProjectTasks(Model model, @RequestParam(name = "teamId") long teamId) {
         try {
-            task.setStatus(TaskStatus.NOT_STARTED);
-            //task.setProject();
-            taskService.add(task);
+            model.addAttribute("taskList", taskService.getAllTasksOfTeam(teamId));
+            return "task-list";
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
+            return getAllTasks(model);
         }
-        return "redirect:/task/all";
+    }
+
+    @GetMapping("/add")
+    public String addTaskForm(Model model, @RequestParam(name = "projectId") long projectId) {
+        try {
+            Project taskOwner = projectService.getByIdOrThrow(projectId);
+            model.addAttribute("newTask", new Task());
+            model.addAttribute("ownerId", projectId);
+            return "task-add-form";
+        } catch (InvalidOperation invalidOperation) {
+            invalidOperation.printStackTrace();
+            return "redirect:/project/all";
+        }
+    }
+
+    @PostMapping("/add")
+    public String addTask(Task task, long ownerId) {
+        try {
+            task.setStatus(TaskStatus.NOT_STARTED);
+            task.setProject(projectService.getByIdOrThrow(ownerId));
+            taskService.add(task);
+            return "redirect:/project/" + ownerId;
+        } catch (InvalidOperation invalidOperation) {
+            invalidOperation.printStackTrace();
+            return "redirect:/task/all";
+        }
     }
 
     @GetMapping("/edit/{id}")
     public String editTask(Model model, @PathVariable(name = "id") long taskId) {
         try {
-            model.addAttribute("newTask", taskService.getByIdOrThrow(taskId));
+            Task taskToEdit = taskService.getByIdOrThrow(taskId);
+            model.addAttribute("newTask", taskToEdit);
+            model.addAttribute("ownerId", taskToEdit.getProject().getId());
             return "task-add-form";
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();

@@ -5,25 +5,26 @@
     <title>Task details</title>
 </head>
 <body>
-<table th:object="${taskDetails}">
+<h2>Task</h2>
+<table>
   <tr>
     <td>Task Id</td>
-    <td th:text="*{getId()}"></td>
+    <td th:text="${taskDetails.getId()}"></td>
   </tr>
   <tr>
     <td>Description</td>
-    <td th:text="*{getDescription()}"></td>
+    <td th:text="${taskDetails.getDescription()}"></td>
   </tr>
   <tr>
     <td>Status</td>
-    <td th:text="*{getStatus()}"></td>
+    <td th:text="${taskDetails.getStatus()}"></td>
   </tr>
   <tr>
     <td>Project (debug info)</td>
-    <td th:text="*{getProject().getId()}"></td>
+    <td th:text="${taskDetails.getProject().getId()}"></td>
   </tr>
 </table>
-
+<h2>Comments</h2>
 <table>
   <tr>
     <th>No.</th>
@@ -42,6 +43,6 @@
     <td><a th:href="@{'/comment/delete/'+${comment.getId()}}">Delete</a></td>
   </tr>
 </table>
-
+<h4><a th:href="@{'/comment/add?taskId=' + ${taskDetails.getId()}}">Add new comment</a></h4>
 </body>
 </html>
