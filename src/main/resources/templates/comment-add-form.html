@@ -3,14 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <title>Comment adding form</title>
+    <th:block th:replace="fragments :: styles" th:remove="tag"/>
 </head>
 <body>
-<form th:action="@{/comment/add}" method="post" th:object="${newComment}">
-    <input type="number" hidden th:field="*{id}">
-    <!--<input type="number" hidden th:name="creatorId" th:value="${userId}">-->
-    <input type="number" hidden th:name="taskId" th:value="${ownerId}">
-    <input type="text" th:field="*{text}" placeholder="Your comment">
-    <button type="submit">Add new comment</button>
-</form>
+<th:block th:replace="fragments :: navigator" th:remove="tag"/>
+<main>
+    <div class="container">
+        <form th:action="@{/comment/add}" method="post" th:object="${newComment}">
+            <input type="number" hidden th:field="*{id}">
+            <!--<input type="number" hidden th:name="creatorId" th:value="${userId}">-->
+            <input type="number" hidden th:name="taskId" th:value="${ownerId}">
+            <input type="text" th:field="*{text}" placeholder="Your comment">
+            <button type="submit">Add new comment</button>
+        </form>
+    </div>
+</main>
+<th:block th:replace="fragments :: scripts" th:remove="tag"/>
 </body>
 </html>
