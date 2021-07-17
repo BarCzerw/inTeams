@@ -4,6 +4,7 @@ import com.sda.inTeams.exception.InvalidOperation;
 import com.sda.inTeams.model.Project.Project;
 import com.sda.inTeams.model.Team.Team;
 import com.sda.inTeams.model.User.User;
+import com.sda.inTeams.model.dto.RegisterDTO;
 import com.sda.inTeams.repository.ProjectRepository;
 import com.sda.inTeams.repository.TeamRepository;
 import com.sda.inTeams.repository.UserRepository;
@@ -155,5 +156,11 @@ public class TeamService implements DatabaseManageable<Team> {
 
     public Team saveToDatabase(Team team) {
         return teamRepository.save(team);
+    }
+
+    public Team createFromRegister(RegisterDTO registerDTO) throws InvalidOperation {
+        return add(Team.builder()
+                .name(registerDTO.getTeamName())
+                .build());
     }
 }
