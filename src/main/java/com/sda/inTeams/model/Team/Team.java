@@ -31,7 +31,7 @@ public class Team implements Indexable {
     @ToString.Exclude
     private Set<User> members;
 
-    @OneToMany(mappedBy = "projectOwner", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "projectOwner", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Set<Project> projects;

@@ -119,7 +119,7 @@ public class DataUtilities {
     }
 
     private static String getRandomTeamName() {
-        return "Project " + getRandomWord() + " " + getRandomNumberAsString();
+        return "Team " + getRandomWord() + " " + getRandomNumberAsString();
     }
 
     private static String getRandomNumberAsString() {

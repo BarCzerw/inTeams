@@ -1,9 +1,6 @@
 package com.sda.inTeams.controller;
 
 import com.sda.inTeams.exception.InvalidOperation;
-import com.sda.inTeams.model.Project.Project;
-import com.sda.inTeams.model.Task.Task;
-import com.sda.inTeams.model.Task.TaskStatus;
 import com.sda.inTeams.model.Team.Team;
 import com.sda.inTeams.model.User.User;
 import com.sda.inTeams.service.ProjectService;
@@ -83,10 +80,10 @@ public class TeamController {
         try {
             Team teamToDelete = teamService.getByIdOrThrow(teamId);
             teamService.delete(teamId);
-            return "redirect:/project/all";
+            return "redirect:/team/all";
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
-            return "redirect:/project/all";
+            return "redirect:/team/all";
         }
     }
 

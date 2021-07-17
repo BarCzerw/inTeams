@@ -70,8 +70,8 @@ public class TaskController {
         try {
             task.setStatus(TaskStatus.NOT_STARTED);
             task.setProject(projectService.getByIdOrThrow(ownerId));
-            taskService.add(task);
-            return "redirect:/project/" + ownerId;
+            Task addedTask = taskService.add(task);
+            return "redirect:/task/" + addedTask.getId();
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
             return "redirect:/task/all";

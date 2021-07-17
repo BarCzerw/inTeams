@@ -7,7 +7,7 @@
 <body>
 <form th:action="@{/project/add}" method="post" th:object="${newProject}">
   <input type="number" hidden th:field="*{id}">
-  <!--<input type="number" hidden th:name="ownerId" th:value="${teamId}">-->
+  <input type="number" hidden th:name="ownerId" th:value="${teamId}">
     <label>Name<input type="text" th:field="*{name}"></label>
     <button type="submit">Add</button>
 </form>

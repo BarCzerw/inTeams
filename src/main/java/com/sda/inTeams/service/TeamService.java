@@ -55,9 +55,14 @@ public class TeamService implements DatabaseManageable<Team> {
 
     public void delete(long teamId) throws InvalidOperation {
         Team team = getByIdOrThrow(teamId);
-        team.setProjects(new HashSet<>());
-        team.setTeamOwner(null);
+        List<User> userList = userRepository.findAllByTeamsContaining(team);
+        for (User user : userList) {
+            user.getTeams().remove(team);
+        }
         team.setMembers(new HashSet<>());
+        //team.setProjects(new HashSet<>());
+        team.setTeamOwner(null);
+        userRepository.saveAll(userList);
         saveToDatabase(team);
         teamRepository.delete(team);
     }

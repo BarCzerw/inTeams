@@ -10,10 +10,7 @@ import com.sda.inTeams.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -42,23 +39,22 @@ public class ProjectController {
     }
 
     @GetMapping("/add")
-    public String addProjectForm(Model model) {
+    public String addProjectForm(Model model, @RequestParam(name="teamId") long teamId) {
         model.addAttribute("newProject", new Project());
-        //model.addAttribute("teamId", new Team());
+        model.addAttribute("teamId", teamId);
         return "project-add-form";
     }
 
     @PostMapping("/add")
-    public String addProject(Project project) {
-        //long ownerId
+    public String addProject(Project project, long ownerId) {
         try {
-            //project.setProjectOwner(teamService.getByIdOrThrow(ownerId));
+            project.setProjectOwner(teamService.getByIdOrThrow(ownerId));
             project.setStatus(ProjectStatus.NOT_STARTED);
             Project addedProject = projectService.add(project);
             return "redirect:/project/" + addedProject.getId();
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
-            return "redirect:/project/all";
+            return "redirect:/team/all";
         }
     }
 
@@ -66,6 +62,7 @@ public class ProjectController {
     public String editProject(Model model, @PathVariable(name = "id") long projectId) {
         try {
             model.addAttribute("newProject", projectService.getByIdOrThrow(projectId));
+            model.addAttribute("teamId", new Team());
             return "project-add-form";
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
