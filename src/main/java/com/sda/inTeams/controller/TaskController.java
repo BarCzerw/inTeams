@@ -95,7 +95,7 @@ public class TaskController {
     public String deleteTask(@PathVariable(name = "id") long taskId) {
         try {
             Task taskToDelete = taskService.getByIdOrThrow(taskId);
-            long projectId = taskToDelete.getId();
+            long projectId = taskToDelete.getProject().getId();
             taskService.delete(taskId);
             return "redirect:/project/" + projectId;
         } catch (InvalidOperation invalidOperation) {

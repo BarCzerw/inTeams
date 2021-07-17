@@ -43,6 +43,16 @@ public class TeamService implements DatabaseManageable<Team> {
         }
     }
 
+    public Team addWithOwner(Team team, long ownerId) throws InvalidOperation {
+        User owner = userRepository.findById(ownerId).orElseThrow(() -> new InvalidOperation(""));
+        team.setTeamOwner(owner);
+        team.getMembers().add(owner);
+        owner.getTeamsOwned().add(team);
+        owner.getTeams().add(team);
+        userRepository.save(owner);
+        return saveToDatabase(team);
+    }
+
     public void delete(long teamId) throws InvalidOperation {
         Team team = getByIdOrThrow(teamId);
         team.setProjects(new HashSet<>());

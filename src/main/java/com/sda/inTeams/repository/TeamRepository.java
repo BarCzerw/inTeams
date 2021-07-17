@@ -1,5 +1,6 @@
 package com.sda.inTeams.repository;
 
+import com.sda.inTeams.model.Project.Project;
 import com.sda.inTeams.model.Team.Team;
 import com.sda.inTeams.model.User.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,4 +16,5 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
     Set<Team> findAllByMembersContaining(User member);
     Optional<Team> findByName(String name);
     List<Team> findAllByTeamOwner(User user);
+    List<Team> findAllByProjectsContaining(Project project);
 }
