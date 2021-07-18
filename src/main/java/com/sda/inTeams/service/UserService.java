@@ -1,6 +1,7 @@
 package com.sda.inTeams.service;
 
 import com.sda.inTeams.exception.InvalidOperation;
+import com.sda.inTeams.model.Team.Team;
 import com.sda.inTeams.model.User.User;
 import com.sda.inTeams.model.dto.RegisterDto;
 import com.sda.inTeams.model.dto.RegisterTeamDTO;
@@ -59,8 +60,13 @@ public class UserService implements DatabaseManageable<User> {
                 .build());
     }
 
-    public List<User> getUsersOfTeam(long teamId) throws InvalidOperation {
-        return userRepository.findAllByTeamsContaining(teamRepository.findById(teamId).orElseThrow(() -> new InvalidOperation("Team not found!")));
+    public List<User> getUsersOfTeam(Team team){
+        return userRepository.findAllByTeamsContaining(team);
+    }
+
+    public List<User> getAllMembersOfTeam(long teamId) throws InvalidOperation {
+        Team team = teamRepository.findById(teamId).orElseThrow(() -> new InvalidOperation("Team not found!"));
+        return userRepository.findAllByTeamsContaining(team);
     }
 
 }

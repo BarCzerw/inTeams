@@ -5,6 +5,7 @@ import com.sda.inTeams.model.Project.Project;
 import com.sda.inTeams.model.Project.ProjectStatus;
 import com.sda.inTeams.model.Task.Task;
 import com.sda.inTeams.model.Team.Team;
+import com.sda.inTeams.model.User.User;
 import com.sda.inTeams.repository.ProjectRepository;
 import com.sda.inTeams.repository.TaskRepository;
 import com.sda.inTeams.repository.TeamRepository;
@@ -100,5 +101,4 @@ public class ProjectService implements DatabaseManageable<Project> {
     public Project saveToDatabase(Project project) {
         return projectRepository.save(project);
     }
-
 }

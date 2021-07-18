@@ -20,6 +20,21 @@
     <!--<td th:text="${teamDetails.getTeamOwner().getId()}"></td>-->
   </tr>
 </table>
+<h2>Members</h2>
+<table>
+  <tr>
+    <th>No.</th>
+    <th>First name</th>
+    <th>Last name</th>
+    <th>Remove from team</th>
+  </tr>
+  <tr th:each="member, index : ${teamMembers}">
+    <td th:text="${index.index+1}"></td>
+    <td th:text="${member.getFirstName()}"></td>
+    <td th:text="${member.getLastName()}"></td>
+    <td><a th:href="@{~/team/removeUser(teamId=${teamDetails.getId()},userId=${member.getId()})}">Remove</a></td>
+  </tr>
+</table>
 <h2>Projects</h2>
 <table>
   <tr>

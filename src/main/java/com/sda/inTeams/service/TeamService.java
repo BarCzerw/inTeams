@@ -79,16 +79,19 @@ public class TeamService implements DatabaseManageable<Team> {
     }
 
     public void removeUserFromTeam(long teamId, long userId) throws InvalidOperation {
-        Team team = getByIdOrThrow(teamId);
-        User user = getUserByIdOrError(userId);
 
-        if (team.getMembers().contains(user) && !team.getTeamOwner().equals(user)) {
-            team.getMembers().remove(user);
+        Team team = getByIdOrThrow(teamId);
+        User user = userRepository.findById(userId).orElseThrow(() -> new InvalidOperation("User not found!"));
+        List<User> teamUsers = userRepository.findAllByTeamsContaining(team);
+
+        if (teamUsers.contains(user) && !team.getTeamOwner().equals(user)) {
+            teamUsers.remove(user);
+            team.setMembers(new HashSet<>(teamUsers));
             saveToDatabase(team);
-        } else if (team.getTeamOwner().equals(user)) {
-            throw new InvalidOperation("Cannot remove user id:" + userId + " from team id: " + teamId + " - User is an owner!");
-        } else {
+        } else if (!teamUsers.contains(user)) {
             throw new InvalidOperation("Cannot remove user id:" + userId + " from team id:" + teamId + " - User is not a member!");
+        } else {
+            throw new InvalidOperation("Cannot remove user id:" + userId + " from team id: " + teamId + " - User is an owner!");
         }
     }
 

@@ -31,6 +31,7 @@ public class TeamController {
         try {
             model.addAttribute("teamDetails", teamService.getByIdOrThrow(teamId));
             model.addAttribute("teamProjects", projectService.getAllProjectsOfTeam(teamId));
+            model.addAttribute("teamMembers", userService.getAllMembersOfTeam(teamId));
             return "team-details";
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
@@ -87,4 +88,14 @@ public class TeamController {
         }
     }
 
+    @GetMapping("/removeUser")
+    public String removeUserFromTeam(long teamId, long userId) {
+        try {
+            teamService.removeUserFromTeam(teamId, userId);
+            return "redirect:/team/" + teamId;
+        } catch (InvalidOperation invalidOperation) {
+            invalidOperation.printStackTrace();
+            return "redirect:/team/all";
+        }
+    }
 }
