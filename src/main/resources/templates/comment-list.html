@@ -3,25 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <title>Comment list</title>
+    <th:block th:replace="fragments :: styles" th:remove="tag"/>
 </head>
 <body>
-<h2>Comments</h2>
-<h4><a th:href="@{'/comment/add'}">Add new comment</a></h4>
-<table>
-    <tr>
-        <th>No.</th>
-        <th>Text</th>
-        <th>Creator</th>
-        <th>Edit</th>
-        <th>Remove</th>
-    </tr>
-    <tr th:each="comment, index : ${commentList}">
-        <td th:text="${index.index+1}"></td>
-        <td th:text="${comment.getText()}"></td>
-        <td th:text="${comment.getCreator()}"></td>
-        <td><a th:href="@{'/comment/edit/'+${comment.getId()}}">Edit</a></td>
-        <td><a th:href="@{'/comment/delete/'+${comment.getId()}}">Delete</a></td>
-    </tr>
-</table>
+<th:block th:replace="fragments :: navigator" th:remove="tag"/>
+<main>
+    <div class="container marketing">
+        <h2>Comments</h2>
+        <table>
+            <tr>
+                <th>No.</th>
+                <th>Text</th>
+                <th>Creator</th>
+                <th>Edit</th>
+                <th>Remove</th>
+            </tr>
+            <tr th:each="comment, index : ${commentList}">
+                <td th:text="${index.index+1}"></td>
+                <td th:text="${comment.getText()}"></td>
+                <td th:text="${comment.getCreator()}"></td>
+                <td><a th:href="@{'/comment/edit/'+${comment.getId()}}">Edit</a></td>
+                <td><a th:href="@{'/comment/delete/'+${comment.getId()}}">Delete</a></td>
+            </tr>
+        </table>
+    </div>
+</main>
 </body>
 </html>

@@ -3,44 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <title>Task details</title>
+    <th:block th:replace="fragments :: styles" th:remove="tag"/>
 </head>
 <body>
-<h2>Task</h2>
-<table>
-  <tr>
-    <td>Task Id</td>
-    <td th:text="${taskDetails.getId()}"></td>
-  </tr>
-  <tr>
-    <td>Description</td>
-    <td th:text="${taskDetails.getDescription()}"></td>
-  </tr>
-  <tr>
-    <td>Status</td>
-    <td th:text="${taskDetails.getStatus()}"></td>
-  </tr>
-  <tr>
-    <td>Project (debug info)</td>
-    <td th:text="${taskDetails.getProject().getId()}"></td>
-  </tr>
-</table>
-<h2>Comments</h2>
-<table>
-  <tr>
-    <th>No.</th>
-    <th>Text</th>
-    <th>Creator</th>
-    <th>Edit</th>
-    <th>Remove</th>
-  </tr>
-  <tr th:each="comment, index : ${taskComments}">
-    <td th:text="${index.index+1}"></td>
-    <td th:text="${comment.getText()}"></td>
-    <td th:text="${comment.getCreator()}"></td>
-    <td><a th:href="@{'/comment/edit/'+${comment.getId()}}">Edit</a></td>
-    <td><a th:href="@{'/comment/delete/'+${comment.getId()}}">Delete</a></td>
-  </tr>
-</table>
-<h4><a th:href="@{'/comment/add?taskId=' + ${taskDetails.getId()}}">Add new comment</a></h4>
+<th:block th:replace="fragments :: navigator" th:remove="tag"/>
+<main>
+    <div class="container">
+        <h2>Task</h2>
+        <table>
+            <tr>
+                <td>Task Id</td>
+                <td th:text="${taskDetails.getId()}"></td>
+            </tr>
+            <tr>
+                <td>Description</td>
+                <td th:text="${taskDetails.getDescription()}"></td>
+            </tr>
+            <tr>
+                <td>Status</td>
+                <td th:text="${taskDetails.getStatus()}"></td>
+            </tr>
+            <tr>
+                <td>Project</td>
+                <td><a th:href="@{'/project/' + ${taskDetails.getProject().getId()}}">Go back to project</a></td>
+            </tr>
+        </table>
+        <h2>Comments</h2>
+        <table>
+            <tr>
+                <th>No.</th>
+                <th>Text</th>
+                <th>Creator</th>
+                <th>Edit</th>
+                <th>Remove</th>
+            </tr>
+            <tr th:each="comment, index : ${taskComments}">
+                <td th:text="${index.index+1}"></td>
+                <td th:text="${comment.getText()}"></td>
+                <td th:text="${comment.getCreator()}"></td>
+                <td><a th:href="@{'/comment/edit/'+${comment.getId()}}">Edit</a></td>
+                <td><a th:href="@{'/comment/delete/'+${comment.getId()}}">Delete</a></td>
+            </tr>
+        </table>
+        <h4><a th:href="@{'/comment/add?taskId=' + ${taskDetails.getId()}}">Add new comment</a></h4>
+    </div>
+</main>
+<th:block th:replace="fragments :: scripts" th:remove="tag"/>
 </body>
 </html>

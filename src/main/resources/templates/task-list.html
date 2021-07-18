@@ -3,27 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <title>Task list</title>
+    <th:block th:replace="fragments :: styles" th:remove="tag"/>
 </head>
 <body>
-<h2>Tasks</h2>
-<h4><a th:href="@{'/task/add'}">Add new task</a></h4>
-<table>
-  <tr>
-    <th>No.</th>
-    <th>Description</th>
-    <th>Status</th>
-    <th>Show detailed</th>
-    <th>Edit</th>
-    <th>Remove</th>
-  </tr>
-  <tr th:each="task, index : ${taskList}">
-    <td th:text="${index.index+1}"></td>
-    <td th:text="${task.getDescription()}"></td>
-    <td th:text="${task.getStatus()}"></td>
-    <td><a th:href="@{'/task/'+${task.getId()}}">Details</a></td>
-    <td><a th:href="@{'/task/edit/'+${task.getId()}}">Edit</a></td>
-    <td><a th:href="@{'/task/delete/'+${task.getId()}}">Delete</a></td>
-  </tr>
-</table>
+<th:block th:replace="fragments :: navigator" th:remove="tag"/>
+<main>
+    <div class="container marketing">
+        <h2>Tasks</h2>
+        <table>
+            <tr>
+                <th>No.</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Show detailed</th>
+                <th>Edit</th>
+                <th>Remove</th>
+            </tr>
+            <tr th:each="task, index : ${taskList}">
+                <td th:text="${index.index+1}"></td>
+                <td th:text="${task.getDescription()}"></td>
+                <td th:text="${task.getStatus()}"></td>
+                <td><a th:href="@{'/task/'+${task.getId()}}">Details</a></td>
+                <td><a th:href="@{'/task/edit/'+${task.getId()}}">Edit</a></td>
+                <td><a th:href="@{'/task/delete/'+${task.getId()}}">Delete</a></td>
+            </tr>
+        </table>
+    </div>
+</main>
 </body>
 </html>
