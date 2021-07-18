@@ -2,7 +2,8 @@ package com.sda.inTeams.service;
 
 import com.sda.inTeams.exception.InvalidOperation;
 import com.sda.inTeams.model.User.User;
-import com.sda.inTeams.model.dto.RegisterDTO;
+import com.sda.inTeams.model.dto.RegisterDto;
+import com.sda.inTeams.model.dto.RegisterTeamDTO;
 import com.sda.inTeams.repository.TeamRepository;
 import com.sda.inTeams.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +52,7 @@ public class UserService implements DatabaseManageable<User> {
         return userRepository.save(user);
     }
 
-    public User createFromRegister(RegisterDTO registerDTO) throws InvalidOperation {
+    public User createFromRegister(RegisterDto registerDTO) throws InvalidOperation {
         return add(User.builder()
                 .username(registerDTO.getUsername())
                 .password(registerDTO.getPassword())

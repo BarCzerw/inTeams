@@ -27,12 +27,12 @@ public class User implements Indexable {
     private String firstName;
     private String lastName;
 
-    @OneToMany(mappedBy = "teamOwner")
+    @OneToMany(mappedBy = "teamOwner", fetch = FetchType.EAGER)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Set<Team> teamsOwned;
 
-    @ManyToMany(mappedBy = "members")
+    @ManyToMany(mappedBy = "members", fetch = FetchType.EAGER)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Set<Team> teams;

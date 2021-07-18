@@ -2,13 +2,16 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>Team register form</title>
+  <title>User register form</title>
 </head>
 <body>
-<form th:action="@{/register/team}" method="post" th:object="${registerInfo}">
-  <label>Team name<input type="text" th:field="*{teamName}"></label>
+<form th:action="@{/register/user}" method="post" th:object="${registerInfo}">
   <label>Username<input type="text" th:field="*{username}"></label>
   <label>Password<input type="text" th:field="*{password}"></label>
+  <select th:field="*{teamId}">
+    <option th:each="team : ${teamList}" th:text="${team.getId()}" th:value="${team.getId()}"></option>
+  </select>
+
   <button type="submit">Register</button>
 </form>
 </body>

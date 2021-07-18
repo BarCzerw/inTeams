@@ -13,7 +13,7 @@ import java.util.Set;
 @Repository
 public interface TeamRepository extends JpaRepository<Team, Long> {
 
-    Set<Team> findAllByMembersContaining(User member);
+    List<Team> findAllByMembersContaining(User member);
     Optional<Team> findByName(String name);
     List<Team> findAllByTeamOwner(User user);
     List<Team> findAllByProjectsContaining(Project project);

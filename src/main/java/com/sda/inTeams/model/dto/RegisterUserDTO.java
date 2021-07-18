@@ -3,9 +3,10 @@ package com.sda.inTeams.model.dto;
 import lombok.Data;
 
 @Data
-public class RegisterDTO {
+public class RegisterUserDTO implements RegisterDto {
 
-    private String teamName;
+    private long teamId;
+
     private String username;
     private String password;
 
