@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Team details</title>
+</head>
+<body>
+<h2>Team</h2>
+<table>
+  <tr>
+    <td>Team Id</td>
+    <td th:text="${teamDetails.getId()}"></td>
+  </tr>
+  <tr>
+    <td>Name</td>
+    <td th:text="${teamDetails.getName()}"></td>
+  </tr>
+  <tr>
+    <td>Team owner</td>
+    <!--<td th:text="${teamDetails.getTeamOwner().getId()}"></td>-->
+  </tr>
+</table>
+<h2>Projects</h2>
+<table>
+  <tr>
+    <th>No.</th>
+    <th>Name</th>
+    <th>Team</th>
+    <th>Status</th>
+    <th>Show detailed</th>
+    <th>Edit</th>
+    <th>Remove</th>
+  </tr>
+  <tr th:each="prj, index : ${teamProjects}">
+    <td th:text="${index.index+1}"></td>
+    <td th:text="${prj.getName()}"></td>
+    <td th:text="${prj.getStatus()}"></td>
+    <td><a th:href="@{'/project/'+${prj.getId()}}">Details</a></td>
+    <td><a th:href="@{'/project/edit/'+${prj.getId()}}">Edit</a></td>
+    <td><a th:href="@{'/project/delete/'+${prj.getId()}}">Delete</a></td>
+  </tr>
+</table>
+<h4><a th:href="@{'/project/add?teamId=' + ${teamDetails.getId()}}">Add new project</a></h4>
+</body>
+</html>

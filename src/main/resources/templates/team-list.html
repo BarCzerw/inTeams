@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Team list</title>
+</head>
+<body>
+<h2>Teams</h2>
+<h4><a th:href="@{'/team/add'}">Add new team</a></h4>
+<table>
+  <tr>
+    <th>No.</th>
+    <th>Name</th>
+    <th>Members count</th>
+    <th>Projects count</th>
+    <th>Show details</th>
+    <th>Edit</th>
+    <th>Remove</th>
+  </tr>
+  <tr th:each="team, index : ${teamList}">
+    <td th:text="${index.index+1}"></td>
+    <td th:text="${team.getName()}"></td>
+    <td th:text="${team.getMembers().size()}"></td>
+    <td th:text="${team.getProjects().size()}"></td>
+    <td><a th:href="@{'/team/'+${team.getId()}}">Details</a></td>
+    <td><a th:href="@{'/team/edit/'+${team.getId()}}">Edit</a></td>
+    <td><a th:href="@{'/team/delete/'+${team.getId()}}">Delete</a></td>
+  </tr>
+</table>
+</body>
+</html>

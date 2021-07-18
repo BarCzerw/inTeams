@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Task adding form</title>
+</head>
+<body>
+<form th:action="@{/task/add}" method="post" th:object="${newTask}">
+  <input type="number" hidden th:field="*{id}">
+  <input type="number" hidden th:value="${ownerId}" th:name="ownerId">
+  <label>Name<input type="text" th:field="*{description}"></label>
+  <button type="submit">Add</button>
+</form>
+</body>
+</html>
