@@ -6,11 +6,13 @@ import com.sda.inTeams.model.Project.ProjectStatus;
 import com.sda.inTeams.model.Task.Task;
 import com.sda.inTeams.model.Task.TaskStatus;
 import com.sda.inTeams.model.Team.Team;
+import com.sda.inTeams.model.User.User;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 public class DataUtilities {
 
@@ -128,5 +130,20 @@ public class DataUtilities {
             randomNumberAsString = "0" + randomNumberAsString;
         }
         return randomNumberAsString;
+    }
+
+    public static List<User> getRandomUserList(int size) {
+        List<User> users = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            users.add(getRandomUser());
+        }
+        return users;
+    }
+
+    private static User getRandomUser() {
+        return User.builder()
+                .firstName("Name" + getRandomNumberAsString())
+                .lastName("Last" + getRandomNumberAsString())
+                .build();
     }
 }
