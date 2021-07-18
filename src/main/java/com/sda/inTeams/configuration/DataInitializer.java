@@ -3,10 +3,11 @@ package com.sda.inTeams.configuration;
 import com.sda.inTeams.model.Comment.Comment;
 import com.sda.inTeams.model.Project.Project;
 import com.sda.inTeams.model.Task.Task;
+import com.sda.inTeams.model.Team.Team;
 import com.sda.inTeams.repository.CommentRepository;
 import com.sda.inTeams.repository.ProjectRepository;
 import com.sda.inTeams.repository.TaskRepository;
-import com.sda.inTeams.service.ProjectService;
+import com.sda.inTeams.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
@@ -19,21 +20,25 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DataInitializer implements ApplicationListener<ContextRefreshedEvent> {
 
+    private final TeamRepository teamRepository;
     private final ProjectRepository projectRepository;
     private final TaskRepository taskRepository;
     private final CommentRepository commentRepository;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        List<Project> projectList = projectRepository.saveAll(DataUtilities.getRandomProjectList(5));
-        for (Project project : projectList) {
-            List<Task> taskList = taskRepository.saveAll(DataUtilities.getRandomTaskList(10, project));
-            for (Task task : taskList) {
-                List<Comment> commentList = commentRepository.saveAll(DataUtilities.getRandomCommentList(15, task));
-                task.setComments(new HashSet<>(commentList));
+        List<Team> teamList = teamRepository.saveAll(DataUtilities.getRandomTeamList(3));
+        for (Team team : teamList) {
+            List<Project> projectList = projectRepository.saveAll(DataUtilities.getRandomProjectList(5, team));
+            for (Project project : projectList) {
+                List<Task> taskList = taskRepository.saveAll(DataUtilities.getRandomTaskList(10, project));
+                for (Task task : taskList) {
+                    List<Comment> commentList = commentRepository.saveAll(DataUtilities.getRandomCommentList(15, task));
+                    task.setComments(new HashSet<>(commentList));
+                }
+                project.setTasks(new HashSet<>(taskList));
             }
-            project.setTasks(new HashSet<>(taskList));
+            projectRepository.saveAll(projectList);
         }
-        projectRepository.saveAll(projectList);
     }
 }

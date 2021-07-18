@@ -4,16 +4,14 @@ import com.sda.inTeams.exception.InvalidOperation;
 import com.sda.inTeams.model.Project.Project;
 import com.sda.inTeams.model.Team.Team;
 import com.sda.inTeams.model.User.User;
+import com.sda.inTeams.model.dto.RegisterTeamDTO;
 import com.sda.inTeams.repository.ProjectRepository;
 import com.sda.inTeams.repository.TeamRepository;
 import com.sda.inTeams.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -43,22 +41,38 @@ public class TeamService implements DatabaseManageable<Team> {
         }
     }
 
+    public Team addWithOwner(Team team, long ownerId) throws InvalidOperation {
+        User owner = userRepository.findById(ownerId).orElseThrow(() -> new InvalidOperation(""));
+        team.setTeamOwner(owner);
+        team.getMembers().add(owner);
+        owner.getTeamsOwned().add(team);
+        owner.getTeams().add(team);
+        userRepository.save(owner);
+        return saveToDatabase(team);
+    }
+
     public void delete(long teamId) throws InvalidOperation {
         Team team = getByIdOrThrow(teamId);
-        team.setProjects(new HashSet<>());
-        team.setTeamOwner(null);
+        List<User> userList = userRepository.findAllByTeamsContaining(team);
+        for (User user : userList) {
+            user.getTeams().remove(team);
+        }
         team.setMembers(new HashSet<>());
+        //team.setProjects(new HashSet<>());
+        team.setTeamOwner(null);
+        userRepository.saveAll(userList);
         saveToDatabase(team);
         teamRepository.delete(team);
     }
 
-    public void addUserToTeam(long teamId, long userId) throws InvalidOperation {
-        Team team = getByIdOrThrow(teamId);
-        User user = getUserByIdOrError(userId);
+    public Team addUserToTeam(Team team, User user) throws InvalidOperation {
 
-        if (!team.getMembers().contains(user)) {
-            team.getMembers().add(user);
-            saveToDatabase(team);
+        Set<User> teamUsers = new HashSet<>(userRepository.findAllByTeamsContaining(team));
+
+        if (!teamUsers.contains(user)) {
+            teamUsers.add(user);
+            team.setMembers(teamUsers);
+            return saveToDatabase(team);
         } else {
             throw new InvalidOperation("Cannot add user id:" + user.getId() + " to team id:" + team.getId() + " - User is already a member");
         }
@@ -140,5 +154,15 @@ public class TeamService implements DatabaseManageable<Team> {
 
     public Team saveToDatabase(Team team) {
         return teamRepository.save(team);
+    }
+
+    public Team createFromRegister(RegisterTeamDTO registerTeamDTO) throws InvalidOperation {
+        return add(Team.builder()
+                .name(registerTeamDTO.getTeamName())
+                .build());
+    }
+
+    public List<Team> getTeamsOfUser(long userId) throws InvalidOperation {
+        return teamRepository.findAllByMembersContaining(userRepository.findById(userId).orElseThrow(() -> new InvalidOperation("User not found!")));
     }
 }

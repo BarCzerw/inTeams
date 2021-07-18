@@ -11,7 +11,7 @@
     <div class="container">
         <form th:action="@{/project/add}" method="post" th:object="${newProject}">
             <input type="number" hidden th:field="*{id}">
-            <!--<input type="number" hidden th:name="ownerId" th:value="${teamId}">-->
+            <input type="number" hidden th:name="ownerId" th:value="${teamId}">
             <input type="text" th:field="*{name}" placeholder="Project name">
             <button type="submit">Add new project</button>
         </form>

@@ -2,6 +2,8 @@ package com.sda.inTeams.service;
 
 import com.sda.inTeams.exception.InvalidOperation;
 import com.sda.inTeams.model.User.User;
+import com.sda.inTeams.model.dto.RegisterDto;
+import com.sda.inTeams.model.dto.RegisterTeamDTO;
 import com.sda.inTeams.repository.TeamRepository;
 import com.sda.inTeams.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +50,17 @@ public class UserService implements DatabaseManageable<User> {
 
     public User saveToDatabase(User user) {
         return userRepository.save(user);
+    }
+
+    public User createFromRegister(RegisterDto registerDTO) throws InvalidOperation {
+        return add(User.builder()
+                .username(registerDTO.getUsername())
+                .password(registerDTO.getPassword())
+                .build());
+    }
+
+    public List<User> getUsersOfTeam(long teamId) throws InvalidOperation {
+        return userRepository.findAllByTeamsContaining(teamRepository.findById(teamId).orElseThrow(() -> new InvalidOperation("Team not found!")));
     }
 
 }

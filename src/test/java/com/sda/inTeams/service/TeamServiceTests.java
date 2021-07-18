@@ -121,7 +121,7 @@ public class TeamServiceTests {
         void canRemoveValidTeamWithMember() throws InvalidOperation {
             Team team = teamService.getTeamByName("Test Team 001").orElseThrow();
             User user = userRepository.save(TEAM_MEMBER);
-            teamService.addUserToTeam(team.getId(), user.getId());
+            teamService.addUserToTeam(team, user);
             teamService.delete(team.getId());
         }
 
@@ -130,8 +130,8 @@ public class TeamServiceTests {
             Team team = teamService.getTeamByName("Test Team 001").orElseThrow();
             User user = userRepository.save(TEAM_MEMBER);
             User owner = userRepository.save(TEAM_OWNER);
-            teamService.addUserToTeam(team.getId(), user.getId());
-            teamService.addUserToTeam(team.getId(), owner.getId());
+            teamService.addUserToTeam(team, user);
+            teamService.addUserToTeam(team, owner);
             teamService.setOwnerOfTeam(team.getId(), owner.getId());
             teamService.delete(team.getId());
         }
@@ -177,7 +177,7 @@ public class TeamServiceTests {
             User user = userRepository.save(NEW_USER);
             Team team = teamRepository.findByName("Test Team 001").orElseThrow();
             try {
-                teamService.addUserToTeam(team.getId(), user.getId());
+                teamService.addUserToTeam(team, user);
             } catch (InvalidOperation invalidOperation) {
                 invalidOperation.printStackTrace();
             }
@@ -188,7 +188,7 @@ public class TeamServiceTests {
         void cannotAddMemberWhoIsAlreadyInTeam() {
             Team team = teamRepository.findByName("Test Team 001").orElseThrow();
             User user = userRepository.findByFirstNameAndLastName("Jan", "Kowalski").orElseThrow();
-            Assertions.assertThrows(InvalidOperation.class, () -> teamService.addUserToTeam(team.getId(), user.getId()));
+            Assertions.assertThrows(InvalidOperation.class, () -> teamService.addUserToTeam(team, user));
             assert_teamMembersCount(INITIAL_TEAM_SIZE);
         }
 

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Team register form</title>
+</head>
+<body>
+<form th:action="@{/register/team}" method="post" th:object="${registerInfo}">
+  <label>Team name<input type="text" th:field="*{teamName}"></label>
+  <label>Username<input type="text" th:field="*{username}"></label>
+  <label>Password<input type="text" th:field="*{password}"></label>
+  <button type="submit">Register</button>
+</form>
+</body>
+</html>
