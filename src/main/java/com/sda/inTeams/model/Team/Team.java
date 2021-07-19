@@ -6,7 +6,6 @@ import com.sda.inTeams.model.User.User;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -30,11 +29,11 @@ public class Team implements Indexable {
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    private Set<User> members = new HashSet<>();
+    private Set<User> members;
 
-    @OneToMany(mappedBy = "projectOwner", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "projectOwner", fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    private Set<Project> projects = new HashSet<>();
+    private Set<Project> projects;
 
 }
