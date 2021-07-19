@@ -2,6 +2,7 @@ package com.sda.inTeams.repository;
 
 import com.sda.inTeams.model.Comment.Comment;
 import com.sda.inTeams.model.Task.Task;
+import com.sda.inTeams.model.User.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,5 +12,5 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment,Long> {
 
     List<Comment> findAllByTask(Task task);
-
+    List<Comment> findAllByCreator(User user);
 }

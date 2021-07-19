@@ -11,7 +11,10 @@ import com.sda.inTeams.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -67,11 +70,11 @@ public class TeamService implements DatabaseManageable<Team> {
 
     public Team addUserToTeam(Team team, User user) throws InvalidOperation {
 
-        Set<User> teamUsers = new HashSet<>(userRepository.findAllByTeamsContaining(team));
+        List<User> teamUsers = userRepository.findAllByTeamsContaining(team);
 
         if (!teamUsers.contains(user)) {
             teamUsers.add(user);
-            team.setMembers(teamUsers);
+            team.setMembers(new HashSet<>(teamUsers));
             return saveToDatabase(team);
         } else {
             throw new InvalidOperation("Cannot add user id:" + user.getId() + " to team id:" + team.getId() + " - User is already a member");
