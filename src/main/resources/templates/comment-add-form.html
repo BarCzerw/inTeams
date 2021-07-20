@@ -11,10 +11,10 @@
     <div class="container">
         <form th:action="@{/comment/add}" method="post" th:object="${newComment}">
             <input type="number" hidden th:field="*{id}">
-            <!--<input type="number" hidden th:name="creatorId" th:value="${userId}">-->
+            <input type="number" hidden th:name="userId" th:value="${creatorId}">
             <input type="number" hidden th:name="taskId" th:value="${ownerId}">
             <input type="text" th:field="*{text}" placeholder="Your comment">
-            <button type="submit">Add new comment</button>
+            <button type="submit">Submit comment</button>
         </form>
     </div>
 </main>

@@ -21,7 +21,7 @@
             </tr>
             <tr>
                 <td>Status</td>
-                <td th:text="${taskDetails.getStatus()}"></td>
+                <td th:text="${taskDetails.getStatus().getTextRepresentation()}"></td>
             </tr>
             <tr>
                 <td>Project</td>
@@ -40,12 +40,12 @@
             <tr th:each="comment, index : ${taskComments}">
                 <td th:text="${index.index+1}"></td>
                 <td th:text="${comment.getText()}"></td>
-                <td th:text="${comment.getCreator()}"></td>
+                <td th:text="${comment.getCreator().getFirstName() + ' ' + comment.getCreator().getLastName()}"></td>
                 <td><a th:href="@{'/comment/edit/'+${comment.getId()}}">Edit</a></td>
                 <td><a th:href="@{'/comment/delete/'+${comment.getId()}}">Delete</a></td>
             </tr>
         </table>
-        <h4><a th:href="@{'/comment/add?taskId=' + ${taskDetails.getId()}}">Add new comment</a></h4>
+        <h4><a th:href="@{/comment/add(taskId=${taskDetails.getId()},userId='1')}">Add new comment</a></h4>
     </div>
 </main>
 <th:block th:replace="fragments :: scripts" th:remove="tag"/>

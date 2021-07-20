@@ -21,11 +21,11 @@
             </tr>
             <tr>
                 <td>Owner</td>
-                <td th:text="*{getProjectOwner()}"></td>
+                <td th:text="*{getProjectOwner().getName()}"></td>
             </tr>
             <tr>
                 <td>Status</td>
-                <td th:text="*{getStatus()}"></td>
+                <td th:text="*{getStatus().getTextRepresentation()}"></td>
             </tr>
         </table>
         <h2>Tasks</h2>
@@ -41,7 +41,7 @@
             <tr th:each="task, index : ${projectTasks}">
                 <td th:text="${index.index+1}"></td>
                 <td th:text="${task.getDescription()}"></td>
-                <td th:text="${task.getStatus()}"></td>
+                <td th:text="${task.getStatus().getTextRepresentation()}"></td>
                 <td><a th:href="@{'/task/'+${task.getId()}}">Show</a></td>
                 <td><a th:href="@{'/task/edit/'+${task.getId()}}">Edit</a></td>
                 <td><a th:href="@{'/task/delete/'+${task.getId()}}">Delete</a></td>

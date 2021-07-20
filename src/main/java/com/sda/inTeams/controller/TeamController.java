@@ -40,7 +40,7 @@ public class TeamController {
     }
 
     @GetMapping("/add")
-    public String addTeamForm(Model model, @RequestParam(name = "ownerId") long userId) {
+    public String addTeamForm(Model model, long userId) {
         try {
             User projectOwner = userService.getByIdOrThrow(userId);
             model.addAttribute("newTeam", new Team());
@@ -53,9 +53,9 @@ public class TeamController {
     }
 
     @PostMapping("/add")
-    public String addTeam(Team team, long ownerId) {
+    public String addTeam(Team team, long userId) {
         try {
-            Team addedTeam = teamService.addWithOwner(team, ownerId);
+            Team addedTeam = teamService.createWithOwner(team, userId);
             return "redirect:/team/" + addedTeam.getId();
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();

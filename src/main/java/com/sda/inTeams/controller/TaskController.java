@@ -13,6 +13,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/task")
@@ -58,6 +61,7 @@ public class TaskController {
             Project taskOwner = projectService.getByIdOrThrow(projectId);
             model.addAttribute("newTask", new Task());
             model.addAttribute("ownerId", projectId);
+            model.addAttribute("statuses", new ArrayList<>(List.of(TaskStatus.values())));
             return "task-add-form";
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
@@ -68,7 +72,7 @@ public class TaskController {
     @PostMapping("/add")
     public String addTask(Task task, long ownerId) {
         try {
-            task.setStatus(TaskStatus.NOT_STARTED);
+            //task.setStatus(task.getStatus());
             task.setProject(projectService.getByIdOrThrow(ownerId));
             Task addedTask = taskService.add(task);
             return "redirect:/task/" + addedTask.getId();
@@ -84,6 +88,7 @@ public class TaskController {
             Task taskToEdit = taskService.getByIdOrThrow(taskId);
             model.addAttribute("newTask", taskToEdit);
             model.addAttribute("ownerId", taskToEdit.getProject().getId());
+            model.addAttribute("statuses", new ArrayList<>(List.of(TaskStatus.values())));
             return "task-add-form";
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();

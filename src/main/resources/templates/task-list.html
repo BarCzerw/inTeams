@@ -8,7 +8,7 @@
 <body>
 <th:block th:replace="fragments :: navigator" th:remove="tag"/>
 <main>
-    <div class="container marketing">
+    <div class="container">
         <h2>Tasks</h2>
         <table>
             <tr>
@@ -22,7 +22,7 @@
             <tr th:each="task, index : ${taskList}">
                 <td th:text="${index.index+1}"></td>
                 <td th:text="${task.getDescription()}"></td>
-                <td th:text="${task.getStatus()}"></td>
+                <td th:text="${task.getStatus().getTextRepresentation()}"></td>
                 <td><a th:href="@{'/task/'+${task.getId()}}">Details</a></td>
                 <td><a th:href="@{'/task/edit/'+${task.getId()}}">Edit</a></td>
                 <td><a th:href="@{'/task/delete/'+${task.getId()}}">Delete</a></td>
@@ -30,5 +30,6 @@
         </table>
     </div>
 </main>
+<th:block th:replace="fragments :: scripts" th:remove="tag"/>
 </body>
 </html>

@@ -3,6 +3,7 @@ package com.sda.inTeams.service;
 import com.sda.inTeams.exception.InvalidOperation;
 import com.sda.inTeams.model.Comment.Comment;
 import com.sda.inTeams.model.Task.Task;
+import com.sda.inTeams.model.Task.TaskStatus;
 import com.sda.inTeams.repository.CommentRepository;
 import com.sda.inTeams.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +52,9 @@ public class CommentService implements DatabaseManageable<Comment>{
     @Override
     public void delete(long commentId) throws InvalidOperation {
         Comment comment = getByIdOrThrow(commentId);
+        Task task = taskRepository.findByCommentsContaining(comment).orElseThrow(() -> new InvalidOperation("Task not found!"));
+        task.getComments().remove(comment);
+        taskRepository.save(task);
         commentRepository.delete(comment);
     }
 
