@@ -12,6 +12,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/project")
@@ -42,6 +45,7 @@ public class ProjectController {
     public String addProjectForm(Model model, @RequestParam(name="teamId") long teamId) {
         model.addAttribute("newProject", new Project());
         model.addAttribute("teamId", teamId);
+        model.addAttribute("statuses", new ArrayList<>(List.of(ProjectStatus.values())));
         return "project-add-form";
     }
 
@@ -49,7 +53,7 @@ public class ProjectController {
     public String addProject(Project project, long ownerId) {
         try {
             project.setProjectOwner(teamService.getByIdOrThrow(ownerId));
-            project.setStatus(ProjectStatus.NOT_STARTED);
+            //project.setStatus(project.getStatus());
             Project addedProject = projectService.add(project);
             return "redirect:/project/" + addedProject.getId();
         } catch (InvalidOperation invalidOperation) {
@@ -61,8 +65,10 @@ public class ProjectController {
     @GetMapping("/edit/{id}")
     public String editProject(Model model, @PathVariable(name = "id") long projectId) {
         try {
-            model.addAttribute("newProject", projectService.getByIdOrThrow(projectId));
-            model.addAttribute("teamId", new Team());
+            Project projectToEdit = projectService.getByIdOrThrow(projectId);
+            model.addAttribute("newProject", projectToEdit);
+            model.addAttribute("teamId", projectToEdit.getProjectOwner().getId());
+            model.addAttribute("statuses", new ArrayList<>(List.of(ProjectStatus.values())));
             return "project-add-form";
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
@@ -73,11 +79,14 @@ public class ProjectController {
     @GetMapping("/delete/{id}")
     public String deleteProject(@PathVariable(name = "id") long projectId) {
         try {
+            Project projectToDelete = projectService.getByIdOrThrow(projectId);
+            long redirectTeamId = projectToDelete.getProjectOwner().getId();
             projectService.delete(projectId);
+            return "redirect:/team/" + redirectTeamId;
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
+            return "redirect:/project/all";
         }
-        return "redirect:/project/all";
     }
 
 }

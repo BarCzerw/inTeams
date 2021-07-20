@@ -18,7 +18,7 @@ public class User implements Indexable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    long id;
+    Long id;
 
     private String username;
     private String password;

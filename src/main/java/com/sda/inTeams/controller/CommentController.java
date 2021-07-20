@@ -4,6 +4,9 @@ import com.sda.inTeams.exception.InvalidOperation;
 import com.sda.inTeams.model.Comment.Comment;
 import com.sda.inTeams.model.Task.Task;
 import com.sda.inTeams.model.Task.TaskStatus;
+import com.sda.inTeams.model.User.User;
+import com.sda.inTeams.repository.TaskRepository;
+import com.sda.inTeams.repository.UserRepository;
 import com.sda.inTeams.service.CommentService;
 import com.sda.inTeams.service.TaskService;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +20,8 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController {
 
     private final CommentService commentService;
-    private final TaskService taskService;
+    private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
 
     @GetMapping("/all")
     public String getAllComments(Model model) {
@@ -26,7 +30,7 @@ public class CommentController {
     }
 
     @GetMapping()
-    public String getTaskComments(Model model, @RequestParam(name = "tastaskkId") long taskId) {
+    public String getTaskComments(Model model, @RequestParam(name = "taskId") long taskId) {
         try {
             model.addAttribute("commentList", commentService.getAllByTask(taskId));
         } catch (InvalidOperation invalidOperation) {
@@ -37,11 +41,13 @@ public class CommentController {
     }
 
     @GetMapping("/add")
-    public String addCommentForm(Model model, long taskId) {
+    public String addCommentForm(Model model, long taskId, long userId) {
         try {
-            taskService.getByIdOrThrow(taskId);
+            taskRepository.findById(taskId).orElseThrow(() -> new InvalidOperation("Task not found!"));
+            userRepository.findById(userId).orElseThrow(() -> new InvalidOperation("User not found!"));
             model.addAttribute("newComment", new Comment());
             model.addAttribute("ownerId", taskId);
+            model.addAttribute("creatorId", userId);
             return "comment-add-form";
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
@@ -50,11 +56,10 @@ public class CommentController {
     }
 
     @PostMapping("/add")
-    public String addComment(Comment comment, long taskId) {
-        //long creatorId
+    public String addComment(Comment comment, long taskId, long userId) {
         try {
-            //comment.setCreator();
-            comment.setTask(taskService.getByIdOrThrow(taskId));
+            comment.setCreator(userRepository.findById(userId).orElseThrow(()->new InvalidOperation("User not found!")));
+            comment.setTask(taskRepository.findById(taskId).orElseThrow(() -> new InvalidOperation("Task not found!")));
             commentService.add(comment);
             return "redirect:/task/" + taskId;
         } catch (InvalidOperation invalidOperation) {
@@ -69,6 +74,7 @@ public class CommentController {
             Comment commentToEdit = commentService.getByIdOrThrow(commentId);
             model.addAttribute("newComment", commentToEdit);
             model.addAttribute("ownerId", commentToEdit.getTask().getId());
+            model.addAttribute("creatorId", commentToEdit.getCreator().getId());
             return "comment-add-form";
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();

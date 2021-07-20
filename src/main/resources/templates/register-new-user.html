@@ -1,18 +1,24 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>User register form</title>
+    <meta charset="UTF-8">
+    <title>User register form</title>
+    <th:block th:replace="fragments :: styles" th:remove="tag"/>
 </head>
 <body>
-<form th:action="@{/register/user}" method="post" th:object="${registerInfo}">
-  <label>Username<input type="text" th:field="*{username}"></label>
-  <label>Password<input type="text" th:field="*{password}"></label>
-  <select th:field="*{teamId}">
-    <option th:each="team : ${teamList}" th:text="${team.getId()}" th:value="${team.getId()}"></option>
-  </select>
-
-  <button type="submit">Register</button>
-</form>
+<th:block th:replace="fragments :: navigator" th:remove="tag"/>
+<main>
+    <div class="container">
+        <form th:action="@{/register/user}" method="post" th:object="${registerInfo}">
+            <label>Username<input type="text" th:field="*{username}"></label>
+            <label>Password<input type="text" th:field="*{password}"></label>
+            <select th:field="*{teamId}">
+                <option th:each="team : ${teamList}" th:text="${team.getId()}" th:value="${team.getId()}"></option>
+            </select>
+            <button type="submit">Register</button>
+        </form>
+    </div>
+</main>
+<th:block th:replace="fragments :: scripts" th:remove="tag"/>
 </body>
 </html>

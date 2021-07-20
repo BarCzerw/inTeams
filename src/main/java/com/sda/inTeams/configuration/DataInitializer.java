@@ -35,17 +35,17 @@ public class DataInitializer implements ApplicationListener<ContextRefreshedEven
         List<Team> teams = TeamGenerator.generateTeams(6);
 
         for (Team team : teams) {
-            List<User> users = UserGenerator.generateUsers(20);
+            List<User> users = UserGenerator.generateUsers(8);
             connectTeamAndUsers(team, users);
 
-            List<Project> projects = ProjectGenerator.generateProjects(10);
+            List<Project> projects = ProjectGenerator.generateProjects(4);
             connectTeamAndProjects(team, projects);
 
             for (Project project : projects) {
-                List<Task> tasks = TaskGenerator.generateTasks(30);
+                List<Task> tasks = TaskGenerator.generateTasks(6);
                 connectProjectAndTasks(project, tasks);
                 for (Task task : tasks) {
-                    List<Comment> comments = CommentGenerator.generateComments(10);
+                    List<Comment> comments = CommentGenerator.generateComments(3);
                     connectTaskAndComments(task, comments);
                 }
             }

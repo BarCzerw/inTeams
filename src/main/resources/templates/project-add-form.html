@@ -13,7 +13,10 @@
             <input type="number" hidden th:field="*{id}">
             <input type="number" hidden th:name="ownerId" th:value="${teamId}">
             <input type="text" th:field="*{name}" placeholder="Project name">
-            <button type="submit">Add new project</button>
+            <select th:field="*{status}">
+                <option th:each="stat : ${statuses}" th:text="${stat.getTextRepresentation()}" th:value="${stat}"></option>
+            </select>
+            <button type="submit">Submit project</button>
         </form>
     </div>
 </main>

@@ -23,8 +23,8 @@
             <tr th:each="prj, index : ${projectList}">
                 <td th:text="${index.index+1}"></td>
                 <td th:text="${prj.getName()}"></td>
-                <td th:text="${prj.getProjectOwner()}"></td>
-                <td th:text="${prj.getStatus()}"></td>
+                <td th:text="${prj.getProjectOwner().getName()}"></td>
+                <td th:text="${prj.getStatus().getTextRepresentation()}"></td>
                 <td><a th:href="@{'/project/'+${prj.getId()}}">Details</a></td>
                 <td><a th:href="@{'/project/edit/'+${prj.getId()}}">Edit</a></td>
                 <td><a th:href="@{'/project/delete/'+${prj.getId()}}">Delete</a></td>

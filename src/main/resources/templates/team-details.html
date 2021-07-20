@@ -3,58 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <title>Team details</title>
+    <th:block th:replace="fragments :: styles" th:remove="tag"/>
 </head>
 <body>
-<h2>Team</h2>
-<table>
-  <tr>
-    <td>Team Id</td>
-    <td th:text="${teamDetails.getId()}"></td>
-  </tr>
-  <tr>
-    <td>Name</td>
-    <td th:text="${teamDetails.getName()}"></td>
-  </tr>
-  <tr>
-    <td>Team owner</td>
-    <!--<td th:text="${teamDetails.getTeamOwner().getId()}"></td>-->
-  </tr>
-</table>
-<h2>Members</h2>
-<table>
-  <tr>
-    <th>No.</th>
-    <th>First name</th>
-    <th>Last name</th>
-    <th>Remove from team</th>
-  </tr>
-  <tr th:each="member, index : ${teamMembers}">
-    <td th:text="${index.index+1}"></td>
-    <td th:text="${member.getFirstName()}"></td>
-    <td th:text="${member.getLastName()}"></td>
-    <td><a th:href="@{~/team/removeUser(teamId=${teamDetails.getId()},userId=${member.getId()})}">Remove</a></td>
-  </tr>
-</table>
-<h2>Projects</h2>
-<table>
-  <tr>
-    <th>No.</th>
-    <th>Name</th>
-    <th>Team</th>
-    <th>Status</th>
-    <th>Show detailed</th>
-    <th>Edit</th>
-    <th>Remove</th>
-  </tr>
-  <tr th:each="prj, index : ${teamProjects}">
-    <td th:text="${index.index+1}"></td>
-    <td th:text="${prj.getName()}"></td>
-    <td th:text="${prj.getStatus()}"></td>
-    <td><a th:href="@{'/project/'+${prj.getId()}}">Details</a></td>
-    <td><a th:href="@{'/project/edit/'+${prj.getId()}}">Edit</a></td>
-    <td><a th:href="@{'/project/delete/'+${prj.getId()}}">Delete</a></td>
-  </tr>
-</table>
-<h4><a th:href="@{'/project/add?teamId=' + ${teamDetails.getId()}}">Add new project</a></h4>
+<th:block th:replace="fragments :: navigator" th:remove="tag"/>
+<main>
+    <div class="container">
+        <h2>Team</h2>
+        <table>
+            <tr>
+                <td>Team Id</td>
+                <td th:text="${teamDetails.getId()}"></td>
+            </tr>
+            <tr>
+                <td>Name</td>
+                <td th:text="${teamDetails.getName()}"></td>
+            </tr>
+            <tr>
+                <td>Team owner</td>
+                <td th:text="${teamDetails.getTeamOwner().getFirstName() + ' ' + teamDetails.getTeamOwner().getLastName()}"></td>
+            </tr>
+        </table>
+        <h2>Members</h2>
+        <table>
+            <tr>
+                <th>No.</th>
+                <th>First name</th>
+                <th>Last name</th>
+                <th>Remove from team</th>
+            </tr>
+            <tr th:each="member, index : ${teamMembers}">
+                <td th:text="${index.index+1}"></td>
+                <td th:text="${member.getFirstName()}"></td>
+                <td th:text="${member.getLastName()}"></td>
+                <td><a th:href="@{~/team/removeUser(teamId=${teamDetails.getId()},userId=${member.getId()})}">Remove</a>
+                </td>
+            </tr>
+        </table>
+        <h2>Projects</h2>
+        <table>
+            <tr>
+                <th>No.</th>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Show detailed</th>
+                <th>Edit</th>
+                <th>Remove</th>
+            </tr>
+            <tr th:each="prj, index : ${teamProjects}">
+                <td th:text="${index.index+1}"></td>
+                <td th:text="${prj.getName()}"></td>
+                <td th:text="${prj.getStatus().getTextRepresentation()}"></td>
+                <td><a th:href="@{'/project/'+${prj.getId()}}">Details</a></td>
+                <td><a th:href="@{'/project/edit/'+${prj.getId()}}">Edit</a></td>
+                <td><a th:href="@{'/project/delete/'+${prj.getId()}}">Delete</a></td>
+            </tr>
+        </table>
+        <h4><a th:href="@{'/project/add?teamId=' + ${teamDetails.getId()}}">Add new project</a></h4>
+    </div>
+</main>
+<th:block th:replace="fragments :: scripts" th:remove="tag"/>
 </body>
 </html>

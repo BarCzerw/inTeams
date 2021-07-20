@@ -5,7 +5,6 @@ import com.sda.inTeams.model.Project.Project;
 import com.sda.inTeams.model.Project.ProjectStatus;
 import com.sda.inTeams.model.Task.Task;
 import com.sda.inTeams.model.Team.Team;
-import com.sda.inTeams.model.User.User;
 import com.sda.inTeams.repository.ProjectRepository;
 import com.sda.inTeams.repository.TaskRepository;
 import com.sda.inTeams.repository.TeamRepository;
@@ -55,13 +54,12 @@ public class ProjectService implements DatabaseManageable<Project> {
 
     public void delete(long projectId) throws InvalidOperation {
         Project projectToDelete = getByIdOrThrow(projectId);
+        Team team = teamRepository.findByProjectsContaining(projectToDelete).orElseThrow(() -> new InvalidOperation("Team not found!"));
+        List<Project> teamProjects = projectRepository.findAllByProjectOwner(team);
+        teamProjects.remove(projectToDelete);
+        team.setProjects(new HashSet<>(teamProjects));
         projectToDelete.setProjectOwner(null);
-        /*for (Task task : projectToDelete.getTasks()) {
-            task.setProject(null);
-            Task taskToDelete = taskService.saveToDatabase(task);
-            taskService.delete(taskToDelete.getId());
-        }
-        projectToDelete.setTasks(new HashSet<>());*/
+        teamRepository.save(team);
         projectToDelete = saveToDatabase(projectToDelete);
         projectRepository.delete(projectToDelete);
     }

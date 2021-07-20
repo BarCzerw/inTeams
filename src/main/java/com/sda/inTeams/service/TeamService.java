@@ -11,10 +11,7 @@ import com.sda.inTeams.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -44,10 +41,11 @@ public class TeamService implements DatabaseManageable<Team> {
         }
     }
 
-    public Team addWithOwner(Team team, long ownerId) throws InvalidOperation {
+    public Team createWithOwner(Team team, long ownerId) throws InvalidOperation {
         User owner = userRepository.findById(ownerId).orElseThrow(() -> new InvalidOperation(""));
         team.setTeamOwner(owner);
-        team.getMembers().add(owner);
+        List<User> members = new ArrayList<>(List.of(owner));
+        team.setMembers(new HashSet<>(members));
         owner.getTeamsOwned().add(team);
         owner.getTeams().add(team);
         userRepository.save(owner);

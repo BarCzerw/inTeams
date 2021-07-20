@@ -8,7 +8,7 @@
 <body>
 <th:block th:replace="fragments :: navigator" th:remove="tag"/>
 <main>
-    <div class="container marketing">
+    <div class="container">
         <h2>Comments</h2>
         <table>
             <tr>
@@ -21,12 +21,13 @@
             <tr th:each="comment, index : ${commentList}">
                 <td th:text="${index.index+1}"></td>
                 <td th:text="${comment.getText()}"></td>
-                <td th:text="${comment.getCreator()}"></td>
+                <td th:text="${comment.getCreator().getFirstName() + ' ' + comment.getCreator().getLastName()}"></td>
                 <td><a th:href="@{'/comment/edit/'+${comment.getId()}}">Edit</a></td>
                 <td><a th:href="@{'/comment/delete/'+${comment.getId()}}">Delete</a></td>
             </tr>
         </table>
     </div>
 </main>
+<th:block th:replace="fragments :: scripts" th:remove="tag"/>
 </body>
 </html>
