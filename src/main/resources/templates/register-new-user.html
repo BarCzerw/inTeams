@@ -10,11 +10,11 @@
 <main>
     <div class="container">
         <form th:action="@{/register/user}" method="post" th:object="${registerInfo}">
+            <input type="number" hidden th:field="*{teamId}">
+            <input type="text" hidden th:field="*{registerCode}">
             <label>Username<input type="text" th:field="*{username}"></label>
-            <label>Password<input type="text" th:field="*{password}"></label>
-            <select th:field="*{teamId}">
-                <option th:each="team : ${teamList}" th:text="${team.getId()}" th:value="${team.getId()}"></option>
-            </select>
+            <label>Password<input type="password" th:field="*{password}"></label>
+            <label>Confirm password<input type="password" th:field="*{confirmPassword}"></label>
             <button type="submit">Register</button>
         </form>
     </div>
