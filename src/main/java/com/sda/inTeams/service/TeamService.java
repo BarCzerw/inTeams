@@ -166,7 +166,11 @@ public class TeamService implements DatabaseManageable<Team> {
                 .build());
     }
 
-    public List<Team> getTeamsOfUser(long userId) throws InvalidOperation {
+    public List<Team> getTeamsContainingMember(long userId) throws InvalidOperation {
         return teamRepository.findAllByMembersContaining(userRepository.findById(userId).orElseThrow(() -> new InvalidOperation("User not found!")));
+    }
+
+    public List<Team> getTeamsOwnedBy(long userId) throws InvalidOperation {
+        return teamRepository.findAllByTeamOwner(userRepository.findById(userId).orElseThrow(() -> new InvalidOperation("User not found!")));
     }
 }
