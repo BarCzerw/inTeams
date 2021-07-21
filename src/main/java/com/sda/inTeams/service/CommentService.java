@@ -6,6 +6,7 @@ import com.sda.inTeams.model.Task.Task;
 import com.sda.inTeams.model.Task.TaskStatus;
 import com.sda.inTeams.repository.CommentRepository;
 import com.sda.inTeams.repository.TaskRepository;
+import com.sda.inTeams.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ public class CommentService implements DatabaseManageable<Comment>{
 
     private final CommentRepository commentRepository;
     private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
 
     @Override
     public List<Comment> getAll() {
@@ -62,4 +64,9 @@ public class CommentService implements DatabaseManageable<Comment>{
     public Comment saveToDatabase(Comment entity) {
         return commentRepository.save(entity);
     }
+
+    public List<Comment> getAllUserComments(long userId) throws InvalidOperation {
+        return commentRepository.findAllByCreator(userRepository.findById(userId).orElseThrow(() -> new InvalidOperation("User not found")));
+    }
+
 }
