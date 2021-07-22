@@ -1,7 +1,9 @@
 package com.sda.inTeams.controller;
 
 import com.sda.inTeams.exception.InvalidOperation;
+import com.sda.inTeams.model.User.AccountRole;
 import com.sda.inTeams.model.User.User;
+import com.sda.inTeams.repository.AccountRoleRepository;
 import com.sda.inTeams.service.CommentService;
 import com.sda.inTeams.service.TeamService;
 import com.sda.inTeams.service.UserService;
@@ -13,6 +15,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.HashSet;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @RequestMapping("/user")
@@ -21,6 +26,7 @@ public class UserController {
     private final UserService userService;
     private final TeamService teamService;
     private final CommentService commentService;
+    private final AccountRoleRepository accountRoleRepository;
 
     @GetMapping("/all")
     public String getAllUsers(Model model) {
@@ -47,6 +53,8 @@ public class UserController {
         try {
             User userToEdit = userService.getByIdOrThrow(userId);
             model.addAttribute("newUser", userToEdit);
+            AccountRole adminRole = accountRoleRepository.findByName("ROLE_ADMIN").orElseThrow();
+            model.addAttribute("isAdmin", userToEdit.getRoles().contains(adminRole));
             return "user-edit-form";
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
@@ -55,7 +63,12 @@ public class UserController {
     }
 
     @PostMapping("/save")
-    public String saveEditedUser(Model model, User user) {
+    public String saveEditedUser(Model model, User user, boolean isAdmin) {
+        user.setRoles(new HashSet<>(
+                List.of(
+                        accountRoleRepository
+                                .findByName(isAdmin ? "ROLE_ADMIN" : "ROLE_USER")
+                                .orElseThrow())));
         user = userService.saveToDatabase(user);
         return "redirect:/user/" + user.getId();
     }

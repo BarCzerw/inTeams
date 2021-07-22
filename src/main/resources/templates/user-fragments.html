@@ -1,12 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta charset="UTF-8">
     <th:block th:fragment="styles">
         <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.0.1/css/bootstrap.min.css}"/>
         <link rel="stylesheet" th:href="@{/css/page.css}"/>
-        <link rel="stylesheet" th:href="@{/css/myView.css}"/>
-        <link rel="stylesheet" th:href="@{/css/style.css}"/>
     </th:block>
     <title>Title</title>
 </head>
@@ -23,9 +20,9 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarCollapse">
-                    <ul class="navbar-nav me-auto mb-2 mb-md-0" sec:authorize="hasRole('ADMIN')">
+                    <ul class="navbar-nav me-auto mb-2 mb-md-0">
                         <li class="nav-item">
-                            <a class="nav-link" th:href="@{/team/all}">Teams</a>
+                            <a class="nav-link" th:href="@{/team/all}">My teams</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" th:href="@{/user/all}">Users</a>
@@ -40,11 +37,6 @@
                             <a class="nav-link" th:href="@{/comment/all}">Comments</a>
                         </li>
                     </ul>
-                    <ul class="navbar-nav me-auto mb-2 mb-md-0" sec:authorize="hasRole('USER')">
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/team}">My teams</a>
-                        </li>
-                    </ul>
                     <a sec:authorize="!isAuthenticated()" th:href="@{/login}">
                         <button class="btn btn-outline-success" type="submit">Login</button>
                     </a>
@@ -57,9 +49,5 @@
     </header>
 </th:block>
 
-<th:block th:fragment="scripts">
-    <script th:src="@{/webjars/popper.js/2.9.2/umd/popper.min.js}"/>
-    <script th:src="@{/webjars/bootstrap/5.0.1/js/bootstrap.min.js}"/>
-</th:block>
 </body>
 </html>

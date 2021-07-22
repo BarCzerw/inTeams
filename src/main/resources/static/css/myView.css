@@ -1,0 +1,42 @@
+.mainContainer{
+    display: flex;
+    flex-direction: row;
+    color: white;
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    width: 100%
+}
+
+.navigationPanel{
+    background-color: black;
+    width: 350px;
+    min-width: 350px;
+}
+
+.navigationItem{
+    margin-bottom: 10px;
+    border-bottom: 3px solid #302c28;
+}
+
+.viewWindow{
+    background-color: grey;
+    width: 100%;
+}
+
+.centered{
+    display: flex;
+    justify-content: center;
+}
+
+.textTitle32{
+    font-size: 32px;
+    color: #e37617;
+}
+
+.textTitle20{
+    font-size: 20px;
+    color: #e37617;
+}

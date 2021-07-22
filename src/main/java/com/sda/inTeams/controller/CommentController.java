@@ -2,19 +2,17 @@ package com.sda.inTeams.controller;
 
 import com.sda.inTeams.exception.InvalidOperation;
 import com.sda.inTeams.model.Comment.Comment;
-import com.sda.inTeams.model.Task.Task;
-import com.sda.inTeams.model.Task.TaskStatus;
 import com.sda.inTeams.model.User.User;
 import com.sda.inTeams.repository.TaskRepository;
 import com.sda.inTeams.repository.UserRepository;
 import com.sda.inTeams.service.CommentService;
-import com.sda.inTeams.service.TaskService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.security.Principal;
 
 @Controller
 @RequestMapping("/comment")
@@ -43,24 +41,30 @@ public class CommentController {
     }
 
     @GetMapping("/add")
-    public String addCommentForm(Model model, long taskId, long userId) {
+    public String addCommentForm(Model model, long taskId, long userId, Principal principal) {
         try {
-            taskRepository.findById(taskId).orElseThrow(() -> new InvalidOperation("Task not found!"));
-            userRepository.findById(userId).orElseThrow(() -> new InvalidOperation("User not found!"));
-            model.addAttribute("newComment", new Comment());
-            model.addAttribute("ownerId", taskId);
-            model.addAttribute("creatorId", userId);
-            return "comment-add-form";
+            if (principal instanceof UsernamePasswordAuthenticationToken) {
+                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = (UsernamePasswordAuthenticationToken) principal;
+                if (usernamePasswordAuthenticationToken.getPrincipal() instanceof User) {
+                    User user = (User) usernamePasswordAuthenticationToken.getPrincipal();
+                    taskRepository.findById(taskId).orElseThrow(() -> new InvalidOperation("Task not found!"));
+                    userRepository.findById(userId).orElseThrow(() -> new InvalidOperation("User not found!"));
+                    model.addAttribute("newComment", new Comment());
+                    model.addAttribute("ownerId", taskId);
+                    model.addAttribute("creatorId", user.getId());
+                    return "comment-add-form";
+                }
+            }
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
-            return "redirect:/task/all";
         }
+        return "redirect:/";
     }
 
     @PostMapping("/add")
     public String addComment(Comment comment, long taskId, long userId) {
         try {
-            comment.setCreator(userRepository.findById(userId).orElseThrow(()->new InvalidOperation("User not found!")));
+            comment.setCreator(userRepository.findById(userId).orElseThrow(() -> new InvalidOperation("User not found!")));
             comment.setTask(taskRepository.findById(taskId).orElseThrow(() -> new InvalidOperation("Task not found!")));
             commentService.add(comment);
             return "redirect:/task/" + taskId;

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin panel</title>
+    <th:block th:replace="fragments :: styles" th:remove="tag"/>
+</head>
+<body>
+<th:block th:replace="fragments :: navigator" th:remove="tag"/>
+<main class="rowContainer">
+    <a class="clickable big" th:href="@{/user/all}">List of users</a>
+    <a class="clickable big" th:href="@{/team/all}">List of teams</a>
+    <a class="clickable big" th:href="@{/project/all}">List of projects</a>
+    <a class="clickable big" th:href="@{/task/all}">List of tasks</a>
+    <a class="clickable big" th:href="@{/comment/all}">List of comment</a>
+</main>
+<th:block th:replace="fragments :: scripts" th:remove="tag"/>
+</body>
+</html>

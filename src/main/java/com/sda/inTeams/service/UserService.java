@@ -5,11 +5,14 @@ import com.sda.inTeams.model.Team.Team;
 import com.sda.inTeams.model.User.User;
 import com.sda.inTeams.model.dto.RegisterDto;
 import com.sda.inTeams.model.dto.RegisterTeamDTO;
+import com.sda.inTeams.repository.AccountRoleRepository;
 import com.sda.inTeams.repository.TeamRepository;
 import com.sda.inTeams.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -20,6 +23,8 @@ public class UserService implements DatabaseManageable<User> {
 
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
+    private final AccountRoleRepository accountRoleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public List<User> getAll() {
         return userRepository.findAll();
@@ -56,7 +61,13 @@ public class UserService implements DatabaseManageable<User> {
     public User createFromRegister(RegisterDto registerDTO) throws InvalidOperation {
         return add(User.builder()
                 .username(registerDTO.getUsername())
-                .password(registerDTO.getPassword())
+                .nonHashedPassword(registerDTO.getPassword())
+                .password(passwordEncoder.encode(registerDTO.getPassword()))
+                .roles(new HashSet<>(List.of(accountRoleRepository.findByName("ROLE_USER").orElseThrow(() -> new InvalidOperation("Role not found!")))))
+                .accountNonExpired(true)
+                .accountNonLocked(true)
+                .credentialsNonExpired(true)
+                .enabled(true)
                 .build());
     }
 

@@ -23,6 +23,10 @@
                 <td>Team owner</td>
                 <td th:text="${teamDetails.getTeamOwner().getFirstName() + ' ' + teamDetails.getTeamOwner().getLastName()}"></td>
             </tr>
+            <tr>
+                <td>Register link</td>
+                <td><a th:href="@{~/register/user(teamId=${teamDetails.getId()},registerCode=${teamDetails.getUniqueRegisterId()})}">Register</a></td>
+            </tr>
         </table>
         <h2>Members</h2>
         <table>

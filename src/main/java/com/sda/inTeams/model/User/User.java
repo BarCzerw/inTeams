@@ -27,6 +27,7 @@ public class User implements Indexable, UserDetails {
     Long id;
 
     private String username;
+    private String nonHashedPassword;
     private String password;
 
     private String firstName;
