@@ -24,12 +24,6 @@ public class ProjectController {
     private final TeamService teamService;
     private final TaskService taskService;
 
-    @GetMapping("/all")
-    public String getAllProjects(Model model) {
-        model.addAttribute("projectList", projectService.getAll());
-        return "project-list";
-    }
-
     @GetMapping("/{id}")
     public String getProject(Model model, @PathVariable(name = "id") long projectId) {
         try {

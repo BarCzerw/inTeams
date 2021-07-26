@@ -28,12 +28,6 @@ public class UserController {
     private final CommentService commentService;
     private final AccountRoleRepository accountRoleRepository;
 
-    @GetMapping("/all")
-    public String getAllUsers(Model model) {
-        model.addAttribute("userList", userService.getAll());
-        return "user-list";
-    }
-
     @GetMapping("/{id}")
     public String getUser(Model model, @PathVariable(name = "id") long userId) {
         try {

@@ -9,33 +9,29 @@
 <th:block th:replace="fragments :: navigator" th:remove="tag"/>
 <main>
     <div class="container">
-        <div class="row">
+        <div class="row top-margin-10">
             <form class="col s6 offset-s3" th:action="@{/register/user}" method="post" th:object="${registerInfo}">
                 <input type="number" hidden th:field="*{teamId}">
                 <input type="text" hidden th:field="*{registerCode}">
                 <div class="row">
                     <div class="input-field col s6">
-                        <input placeholder="First Name" id="first_name" type="text" class="validate"
-                               th:field="*{firstName}">
+                        <input id="first_name" type="text" class="validate" th:field="*{firstName}">
                         <label for="first_name">First name</label>
                     </div>
                     <div class="input-field col s6">
-                        <input placeholder="Last Name" id="last_name" type="text" class="validate"
-                               th:field="*{lastName}">
+                        <input id="last_name" type="text" class="validate" th:field="*{lastName}">
                         <label for="last_name">Last name</label>
                     </div>
                 </div>
                 <div class="row">
                     <div class="input-field col s12">
-                        <input placeholder="Placeholder" id="user_name" type="text" class="validate"
-                               th:field="*{username}">
+                        <input id="user_name" type="text" class="validate" th:field="*{username}">
                         <label for="user_name">Username</label>
                     </div>
                 </div>
                 <div class="row">
                     <div class="input-field col s6">
-                        <input placeholder="Placeholder" id="password" type="text" class="validate"
-                               th:field="*{password}">
+                        <input id="password" type="password" class="validate" th:field="*{password}">
                         <label for="password">Password</label>
                     </div>
                     <div class="input-field col s6">

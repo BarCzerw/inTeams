@@ -28,12 +28,6 @@ public class TaskController {
     private final CommentService commentService;
     private final AuthorizationService authorizationService;
 
-    @GetMapping("/all")
-    public String getAllTasks(Model model) {
-        model.addAttribute("taskList", taskService.getAll());
-        return "task-list";
-    }
-
     @GetMapping("/{id}")
     public String getTask(Principal principal, Model model, @PathVariable(name = "id") long taskId) {
         try {
@@ -56,7 +50,7 @@ public class TaskController {
             return "task-list";
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
-            return getAllTasks(model);
+            return "redirect:/";
         }
     }
 

@@ -7,12 +7,16 @@
 </head>
 <body>
 <th:block th:replace="fragments :: navigator" th:remove="tag"/>
-<main class="rowContainer">
-    <a class="clickable big" th:href="@{/user/all}">List of users</a>
-    <a class="clickable big" th:href="@{/team/all}">List of teams</a>
-    <a class="clickable big" th:href="@{/project/all}">List of projects</a>
-    <a class="clickable big" th:href="@{/task/all}">List of tasks</a>
-    <a class="clickable big" th:href="@{/comment/all}">List of comment</a>
+<main>
+    <div class="container">
+        <ul>
+            <li><a th:href="@{/admin/teams}">List of teams</a></li>
+            <li><a th:href="@{/admin/users}">List of users</a></li>
+            <li><a th:href="@{/admin/projects}">List of projects</a></li>
+            <li><a th:href="@{/admin/tasks}">List of tasks</a></li>
+            <li><a th:href="@{/admin/comments}">List of comment</a></li>
+        </ul>
+    </div>
 </main>
 <th:block th:replace="fragments :: scripts" th:remove="tag"/>
 </body>

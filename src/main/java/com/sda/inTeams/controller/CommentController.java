@@ -23,12 +23,6 @@ public class CommentController {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
 
-    @GetMapping("/all")
-    public String getAllComments(Model model) {
-        model.addAttribute("commentList", commentService.getAll());
-        return "comment-list";
-    }
-
     @GetMapping()
     public String getTaskComments(Model model, @RequestParam(name = "taskId") long taskId) {
         try {

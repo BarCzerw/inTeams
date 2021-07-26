@@ -3,12 +3,11 @@ package com.sda.inTeams.controller;
 import com.sda.inTeams.exception.InvalidOperation;
 import com.sda.inTeams.model.Team.Team;
 import com.sda.inTeams.model.User.User;
+import com.sda.inTeams.service.AuthorizationService;
 import com.sda.inTeams.service.ProjectService;
 import com.sda.inTeams.service.TeamService;
 import com.sda.inTeams.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,28 +25,18 @@ public class TeamController {
     private final TeamService teamService;
     private final ProjectService projectService;
     private final UserService userService;
-
-    @GetMapping("/all")
-    public String getAllTeams(Model model) {
-        model.addAttribute("teamList", teamService.getAll());
-        return "team-list";
-    }
+    private final AuthorizationService authorizationService;
 
     @GetMapping("")
     public String getUserTeams(Model model, Principal principal) {
         try {
-            if (principal instanceof UsernamePasswordAuthenticationToken) {
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = (UsernamePasswordAuthenticationToken) principal;
-                if (usernamePasswordAuthenticationToken.getPrincipal() instanceof User) {
-                    User user = (User) usernamePasswordAuthenticationToken.getPrincipal();
-                    model.addAttribute("teamList", teamService.getTeamsContainingMember(user.getId()));
-                    return "team-list";
-                }
-            }
-        } catch (InvalidOperation invalidOperation) {
-            invalidOperation.printStackTrace();
+            User user = authorizationService.getUserCredentials(principal).orElseThrow();
+            model.addAttribute("teamList", teamService.getTeamsContainingMember(user.getId()));
+            return "team-list";
+        } catch (InvalidOperation operation) {
+            operation.printStackTrace();
+            return "redirect:/";
         }
-        return "redirect:/";
     }
 
     @GetMapping("/{id}")
