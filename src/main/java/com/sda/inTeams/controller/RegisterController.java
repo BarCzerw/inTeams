@@ -69,7 +69,7 @@ public class RegisterController {
             return "redirect:/team/" + registerDTO.getTeamId();
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
-            return "redirect:/team/all";
+            return "redirect:/";
         }
     }
 

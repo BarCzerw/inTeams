@@ -63,6 +63,8 @@ public class UserService implements DatabaseManageable<User> {
                 .username(registerDTO.getUsername())
                 .nonHashedPassword(registerDTO.getPassword())
                 .password(passwordEncoder.encode(registerDTO.getPassword()))
+                .firstName(registerDTO.getFirstName())
+                .lastName(registerDTO.getLastName())
                 .roles(new HashSet<>(List.of(accountRoleRepository.findByName("ROLE_USER").orElseThrow(() -> new InvalidOperation("Role not found!")))))
                 .accountNonExpired(true)
                 .accountNonLocked(true)

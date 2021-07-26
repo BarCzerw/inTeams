@@ -12,4 +12,6 @@ public class RegisterUserDTO implements RegisterDto {
     private String password;
     private String confirmPassword;
 
+    private String firstName;
+    private String lastName;
 }

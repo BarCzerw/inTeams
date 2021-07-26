@@ -1,18 +1,20 @@
 package com.sda.inTeams.controller;
 
 import com.sda.inTeams.exception.InvalidOperation;
+import com.sda.inTeams.model.Comment.Comment;
 import com.sda.inTeams.model.Project.Project;
 import com.sda.inTeams.model.Task.Task;
 import com.sda.inTeams.model.Task.TaskStatus;
+import com.sda.inTeams.service.AuthorizationService;
 import com.sda.inTeams.service.CommentService;
 import com.sda.inTeams.service.ProjectService;
 import com.sda.inTeams.service.TaskService;
-import com.sda.inTeams.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,9 +24,9 @@ import java.util.List;
 public class TaskController {
 
     private final TaskService taskService;
-    private final TeamService teamService;
     private final ProjectService projectService;
     private final CommentService commentService;
+    private final AuthorizationService authorizationService;
 
     @GetMapping("/all")
     public String getAllTasks(Model model) {
@@ -33,10 +35,13 @@ public class TaskController {
     }
 
     @GetMapping("/{id}")
-    public String getTask(Model model, @PathVariable(name = "id") long taskId) {
+    public String getTask(Principal principal, Model model, @PathVariable(name = "id") long taskId) {
         try {
             model.addAttribute("taskDetails", taskService.getByIdOrThrow(taskId));
             model.addAttribute("taskComments", commentService.getAllByTask(taskId));
+            model.addAttribute("newComment", new Comment());
+            model.addAttribute("ownerId", taskId);
+            model.addAttribute("creatorId", authorizationService.getUserCredentials(principal).get().getId());
             return "task-details";
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();

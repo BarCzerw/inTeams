@@ -1,6 +1,8 @@
 package com.sda.inTeams.service;
 
+import com.sda.inTeams.model.User.AccountRole;
 import com.sda.inTeams.model.User.User;
+import com.sda.inTeams.repository.AccountRoleRepository;
 import com.sda.inTeams.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,6 +19,7 @@ import java.util.Optional;
 public class AuthorizationService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final AccountRoleRepository accountRoleRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -27,7 +30,7 @@ public class AuthorizationService implements UserDetailsService {
         throw new  UsernameNotFoundException("Cannot find username:" + username);
     }
 
-    public Optional<User> checkUserCredentials(Principal principal) {
+    public Optional<User> getUserCredentials(Principal principal) {
         if (principal instanceof UsernamePasswordAuthenticationToken) {
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = (UsernamePasswordAuthenticationToken) principal;
             if (usernamePasswordAuthenticationToken.getPrincipal() instanceof User) {
@@ -35,5 +38,15 @@ public class AuthorizationService implements UserDetailsService {
             }
         }
         return Optional.empty();
+    }
+
+    public boolean isUserAdmin(Principal principal) {
+        Optional<User> userOptional = getUserCredentials(principal);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            AccountRole accountRole = accountRoleRepository.findByName("ROLE_ADMIN").get();
+            return user.getRoles().contains(accountRole);
+        }
+        return false;
     }
 }

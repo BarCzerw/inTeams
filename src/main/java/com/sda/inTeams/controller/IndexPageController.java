@@ -1,6 +1,5 @@
 package com.sda.inTeams.controller;
 
-import com.sda.inTeams.repository.AccountRoleRepository;
 import com.sda.inTeams.service.AuthorizationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -11,18 +10,18 @@ import java.security.Principal;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/admin")
-public class AdminController {
+@RequestMapping("/")
+public class IndexPageController {
 
     private final AuthorizationService authorizationService;
-    private final AccountRoleRepository accountRoleRepository;
 
     @GetMapping()
-    public String getAdminPanel(Principal principal) {
-        if (authorizationService.isUserAdmin(principal)) {
-            return "admin-panel";
+    public String getIndexPage(Principal principal) {
+        if (authorizationService.getUserCredentials(principal).isEmpty()) {
+            return "index";
         } else {
-            return "redirect:/";
+            return "authenticated-page";
         }
     }
+
 }

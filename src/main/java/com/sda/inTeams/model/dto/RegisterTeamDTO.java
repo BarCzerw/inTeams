@@ -9,5 +9,8 @@ public class RegisterTeamDTO implements RegisterDto {
 
     private String username;
     private String password;
+    private String confirmPassword;
 
+    private String firstName;
+    private String lastName;
 }

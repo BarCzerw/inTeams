@@ -9,14 +9,43 @@
 <th:block th:replace="fragments :: navigator" th:remove="tag"/>
 <main>
     <div class="container">
-        <form th:action="@{/register/user}" method="post" th:object="${registerInfo}">
-            <input type="number" hidden th:field="*{teamId}">
-            <input type="text" hidden th:field="*{registerCode}">
-            <label>Username<input type="text" th:field="*{username}"></label>
-            <label>Password<input type="password" th:field="*{password}"></label>
-            <label>Confirm password<input type="password" th:field="*{confirmPassword}"></label>
-            <button type="submit">Register</button>
-        </form>
+        <div class="row">
+            <form class="col s6 offset-s3" th:action="@{/register/user}" method="post" th:object="${registerInfo}">
+                <input type="number" hidden th:field="*{teamId}">
+                <input type="text" hidden th:field="*{registerCode}">
+                <div class="row">
+                    <div class="input-field col s6">
+                        <input placeholder="First Name" id="first_name" type="text" class="validate"
+                               th:field="*{firstName}">
+                        <label for="first_name">First name</label>
+                    </div>
+                    <div class="input-field col s6">
+                        <input placeholder="Last Name" id="last_name" type="text" class="validate"
+                               th:field="*{lastName}">
+                        <label for="last_name">Last name</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input placeholder="Placeholder" id="user_name" type="text" class="validate"
+                               th:field="*{username}">
+                        <label for="user_name">Username</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s6">
+                        <input placeholder="Placeholder" id="password" type="text" class="validate"
+                               th:field="*{password}">
+                        <label for="password">Password</label>
+                    </div>
+                    <div class="input-field col s6">
+                        <input id="confirm_password" type="password" class="validate" th:field="*{confirmPassword}">
+                        <label for="confirm_password">Confirm password</label>
+                    </div>
+                </div>
+                <button class="btn waves-effect waves-light" type="submit" name="action">Submit</button>
+            </form>
+        </div>
     </div>
 </main>
 <th:block th:replace="fragments :: scripts" th:remove="tag"/>
