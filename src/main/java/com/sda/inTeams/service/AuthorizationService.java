@@ -1,5 +1,6 @@
 package com.sda.inTeams.service;
 
+import com.sda.inTeams.model.Comment.Comment;
 import com.sda.inTeams.model.User.AccountRole;
 import com.sda.inTeams.model.User.User;
 import com.sda.inTeams.repository.AccountRoleRepository;
@@ -48,5 +49,17 @@ public class AuthorizationService implements UserDetailsService {
             return user.getRoles().contains(accountRole);
         }
         return false;
+    }
+
+    public boolean isUserEligibleToDeleteComment(Principal principal, Comment comment) {
+        return isUserCommentCreator(principal,comment) || isUserAdmin(principal);
+    }
+
+    public boolean isUserEligibleToEditComment(Principal principal, Comment comment) {
+        return isUserCommentCreator(principal,comment) || isUserAdmin(principal);
+    }
+
+    private boolean isUserCommentCreator(Principal principal, Comment comment) {
+        return getUserCredentials(principal).orElseThrow().equals(comment.getCreator());
     }
 }

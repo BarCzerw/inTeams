@@ -33,10 +33,10 @@ public class RegisterController {
     public String registerTeam(RegisterTeamDTO registerDTO) {
         try {
             Team registeredTeam = registerService.registerNewTeamWithUser(registerDTO);
-            return "redirect:/team/" + registeredTeam.getId();
+            return "redirect:/login/";
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
-            return "team/all";
+            return "redirect:/";
         }
     }
 
@@ -66,7 +66,7 @@ public class RegisterController {
     public String registerUser(RegisterUserDTO registerDTO) {
         try {
             User registeredUser = registerService.registerNewUserToExistingTeam(registerDTO);
-            return "redirect:/team/" + registerDTO.getTeamId();
+            return "redirect:/login/";
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
             return "redirect:/";

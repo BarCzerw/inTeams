@@ -36,6 +36,7 @@ public class TaskController {
             model.addAttribute("newComment", new Comment());
             model.addAttribute("ownerId", taskId);
             model.addAttribute("creatorId", authorizationService.getUserCredentials(principal).get().getId());
+            model.addAttribute("isAdmin", authorizationService.isUserAdmin(principal));
             return "task-details";
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
