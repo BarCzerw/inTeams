@@ -4,6 +4,7 @@ import com.sda.inTeams.exception.InvalidOperation;
 import com.sda.inTeams.model.User.AccountRole;
 import com.sda.inTeams.model.User.User;
 import com.sda.inTeams.repository.AccountRoleRepository;
+import com.sda.inTeams.service.AuthorizationService;
 import com.sda.inTeams.service.CommentService;
 import com.sda.inTeams.service.TeamService;
 import com.sda.inTeams.service.UserService;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.security.Principal;
 import java.util.HashSet;
 import java.util.List;
 
@@ -27,19 +29,36 @@ public class UserController {
     private final TeamService teamService;
     private final CommentService commentService;
     private final AccountRoleRepository accountRoleRepository;
+    private final AuthorizationService authorizationService;
 
     @GetMapping("/{id}")
-    public String getUser(Model model, @PathVariable(name = "id") long userId) {
+    public String getUser(Model model, Principal principal, @PathVariable(name = "id") long userId) {
         try {
-            model.addAttribute("userDetails", userService.getByIdOrThrow(userId));
-            model.addAttribute("teamsAssignedTo", teamService.getTeamsContainingMember(userId));
-            model.addAttribute("teamsOwnedBy", teamService.getTeamsOwnedBy(userId));
-            model.addAttribute("commentsCreated", commentService.getAllUserComments(userId));
-            return "user-details";
+            User user = authorizationService.getUserCredentials(principal).orElseThrow();
+            if (authorizationService.isUserEligibleToSeeUserDetails(principal, user)) {
+                model.addAttribute("userDetails", userService.getByIdOrThrow(userId));
+                model.addAttribute("teamsAssignedTo", teamService.getTeamsContainingMember(userId));
+                model.addAttribute("teamsOwnedBy", teamService.getTeamsOwnedBy(userId));
+                model.addAttribute("commentsCreated", commentService.getAllUserComments(userId));
+                return "user-details";
+            } else {
+                //unauthorized access
+            }
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
-            return "user-list";
         }
+        return "redirect:/";
+    }
+
+    @GetMapping("/myaccount")
+    public String getMyAccountPage(Model model, Principal principal) {
+        try {
+            User user = authorizationService.getUserCredentials(principal).orElseThrow();
+            return getUser(model, principal, user.getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "redirect:/";
     }
 
     @GetMapping("/edit/{id}")
@@ -52,7 +71,7 @@ public class UserController {
             return "user-edit-form";
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
-            return "redirect:/user/all";
+            return "redirect:/";
         }
     }
 

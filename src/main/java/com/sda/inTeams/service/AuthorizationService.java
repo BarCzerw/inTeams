@@ -97,4 +97,9 @@ public class AuthorizationService implements UserDetailsService {
         User user = getUserCredentials(principal).orElseThrow();
         return isUserAdmin(principal) || team.getMembers().contains(user);
     }
+
+    public boolean isUserEligibleToSeeUserDetails(Principal principal, User userDetails) {
+        User user = getUserCredentials(principal).orElseThrow();
+        return userDetails.equals(user) || isUserAdmin(principal);
+    }
 }
