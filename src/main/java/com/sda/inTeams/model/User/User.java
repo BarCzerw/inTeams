@@ -11,8 +11,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
-import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Entity
@@ -25,13 +25,14 @@ public class User implements Indexable, UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-
     private String username;
     private String nonHashedPassword;
     private String password;
 
     private String firstName;
     private String lastName;
+
+    private final String uniqueInvitationId = UUID.randomUUID().toString().replace("-","");
 
     private boolean accountNonExpired;
     private boolean accountNonLocked;

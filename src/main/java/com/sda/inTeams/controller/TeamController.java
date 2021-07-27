@@ -109,6 +109,19 @@ public class TeamController {
         }
     }
 
+    @PostMapping("/invite")
+    public String inviteUserToTeam(Model model, Principal principal, long teamId, String invitationCode) {
+        try {
+            User userToInvite = userService.getByInvitationCodeOrThrow(invitationCode);
+            Team team = teamService.getByIdOrThrow(teamId);
+            teamService.addUserToTeam(team, userToInvite);
+            return "redirect:/team/" + teamId;
+        } catch (InvalidOperation invalidOperation) {
+            invalidOperation.printStackTrace();
+            return "redirect:/";
+        }
+    }
+
     @GetMapping("/removeUser")
     public String removeUserFromTeam(long teamId, long userId) {
         try {
