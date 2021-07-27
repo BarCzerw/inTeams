@@ -9,7 +9,7 @@
 <th:block th:replace="fragments :: navigator" th:remove="tag"/>
 <main>
   <div class="container">
-    <h2>User</h2>
+    <h2>User<a th:href="@{'/user/edit/' + ${userDetails.getId()}}"><i class="material-icons hoverable">edit</i></a></h2>
     <table>
       <tr>
         <td>User Id</td>

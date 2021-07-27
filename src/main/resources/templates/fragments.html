@@ -17,8 +17,8 @@
         <div class="navbar-fixed">
             <nav>
                 <div class="nav-wrapper">
-                    <a th:href="@{/}" class="brand-logo">
-                        <img th:src="@{/images/logo.png}" height="48">
+                    <a th:href="@{/}" class="brand-logo vertical-aligned">
+                        <img th:src="@{/images/logo.png}" style="margin-top: 8px;" height="48">
                     </a>
                     <ul class="right hide-on-med-and-down">
                         <li sec:authorize="hasRole('ADMIN')">
@@ -26,6 +26,9 @@
                         </li>
                         <li sec:authorize="hasRole('USER')">
                             <a class="nav-link" th:href="@{/team}">My teams</a>
+                        </li>
+                        <li sec:authorize="isAuthenticated()">
+                            <a class="nav-link" th:href="@{/user/myaccount}">My account</a>
                         </li>
                         <li>
                             <a class="waves-effect waves-light btn" sec:authorize="isAuthenticated()"

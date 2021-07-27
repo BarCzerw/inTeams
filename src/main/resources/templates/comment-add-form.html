@@ -9,13 +9,15 @@
 <th:block th:replace="fragments :: navigator" th:remove="tag"/>
 <main>
     <div class="container">
-        <form th:action="@{/comment/add}" method="post" th:object="${newComment}">
+        <div class="row top-margin-10">
+        <form th:action="@{/comment/add}" method="post" th:object="${newComment}" class="col s6 offset-s3">
             <input type="number" hidden th:field="*{id}">
             <input type="number" hidden th:name="userId" th:value="${creatorId}">
             <input type="number" hidden th:name="taskId" th:value="${ownerId}">
             <input type="text" th:field="*{text}" placeholder="Your comment">
-            <button type="submit">Submit comment</button>
+            <button class="btn waves-effect waves-light" type="submit">Submit comment<i class="material-icons right">send</i></button>
         </form>
+        </div>
     </div>
 </main>
 <th:block th:replace="fragments :: scripts" th:remove="tag"/>
