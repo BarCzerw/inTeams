@@ -42,9 +42,9 @@
             <tr th:each="comment, index : ${taskComments}">
                 <td th:text="${index.index+1}"></td>
                 <td th:text="${comment.getText()}"></td>
-                <td th:text="${comment.getCreator().getFirstName() + ' ' + comment.getCreator().getLastName()}"></td>
-                <td><a th:if="${creatorId==comment.getCreator().getId() || isAdmin}" th:href="@{'/comment/edit/'+${comment.getId()}}">Edit</a></td>
-                <td><a th:if="${creatorId==comment.getCreator().getId() || isAdmin}" th:href="@{'/comment/delete/'+${comment.getId()}}">Delete</a></td>
+                <td th:text="${comment.getCreator() != null ? (comment.getCreator().getFirstName() + ' ' + comment.getCreator().getLastName()) : 'Account deleted'}"></td>
+                <!--<td><a th:if="${creatorId==comment.getCreator().getId() || isAdmin}" th:href="@{'/comment/edit/'+${comment.getId()}}">Edit</a></td>
+                <td><a th:if="${creatorId==comment.getCreator().getId() || isAdmin}" th:href="@{'/comment/delete/'+${comment.getId()}}">Delete</a></td>-->
             </tr>
         </table>
         <form th:action="@{/comment/add}" method="post" th:object="${newComment}">
