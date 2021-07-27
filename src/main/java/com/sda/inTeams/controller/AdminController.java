@@ -20,10 +20,12 @@ public class AdminController {
     private final ProjectService projectService;
     private final TaskService taskService;
     private final CommentService commentService;
+    private final DatabaseService databaseService;
 
     @GetMapping()
-    public String getAdminPanel(Principal principal) {
+    public String getAdminPanel(Model model, Principal principal) {
         if (authorizationService.isUserAdmin(principal)) {
+            model.addAttribute("dbInfo", databaseService.getDatabaseInfo());
             return "admin-panel";
         } else {
             return "redirect:/";

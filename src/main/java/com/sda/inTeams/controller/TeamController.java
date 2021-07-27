@@ -32,7 +32,8 @@ public class TeamController {
         try {
             User user = authorizationService.getUserCredentials(principal).orElseThrow();
             model.addAttribute("teamList", teamService.getTeamsContainingMember(user.getId()));
-            return "team-list";
+            model.addAttribute("userId", user.getId());
+            return "user-team-list";
         } catch (InvalidOperation operation) {
             operation.printStackTrace();
             return "redirect:/";
@@ -40,16 +41,23 @@ public class TeamController {
     }
 
     @GetMapping("/{id}")
-    public String getTeam(Model model, @PathVariable(name = "id") long teamId) {
+    public String getTeam(Model model, Principal principal, @PathVariable(name = "id") long teamId) {
         try {
-            model.addAttribute("teamDetails", teamService.getByIdOrThrow(teamId));
-            model.addAttribute("teamProjects", projectService.getAllProjectsOfTeam(teamId));
-            model.addAttribute("teamMembers", userService.getAllMembersOfTeam(teamId));
-            return "team-details";
+            Team team = teamService.getByIdOrThrow(teamId);
+            if (authorizationService.isUserEligibleToSeeTeamDetails(principal, team)) {
+                model.addAttribute("teamDetails", teamService.getByIdOrThrow(teamId));
+                model.addAttribute("teamProjects", projectService.getAllProjectsOfTeam(teamId));
+                model.addAttribute("teamMembers", userService.getAllMembersOfTeam(teamId));
+                model.addAttribute("canManageTeam", authorizationService.isUserEligibleToManageTeam(principal, team));
+                model.addAttribute("userId", authorizationService.getUserCredentials(principal).orElseThrow().getId());
+                return "team-details";
+            } else {
+                //unauthorized access
+            }
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
-            return "team-list";
         }
+        return "redirect:/";
     }
 
     @GetMapping("/add")
@@ -61,7 +69,7 @@ public class TeamController {
             return "team-add-form";
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
-            return "redirect:/team/all";
+            return "redirect:/";
         }
     }
 
@@ -72,7 +80,7 @@ public class TeamController {
             return "redirect:/team/" + addedTeam.getId();
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
-            return "redirect:/team/all";
+            return "redirect:/";
         }
     }
 
@@ -85,7 +93,7 @@ public class TeamController {
             return "team-add-form";
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
-            return "redirect:/team/all";
+            return "redirect:/";
         }
     }
 
@@ -94,10 +102,10 @@ public class TeamController {
         try {
             Team teamToDelete = teamService.getByIdOrThrow(teamId);
             teamService.delete(teamId);
-            return "redirect:/team/all";
+            return "redirect:/team";
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
-            return "redirect:/team/all";
+            return "redirect:/";
         }
     }
 
@@ -108,7 +116,7 @@ public class TeamController {
             return "redirect:/team/" + teamId;
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
-            return "redirect:/team/all";
+            return "redirect:/";
         }
     }
 }

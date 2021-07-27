@@ -75,7 +75,7 @@ public class AuthorizationService implements UserDetailsService {
             User user = getUserCredentials(principal).orElseThrow();
             Project project = projectRepository.findByTasksContaining(task).orElseThrow();
             Team team = teamRepository.findByProjectsContaining(project).orElseThrow();
-            return userRepository.findAllByTeamsContaining(team).contains(user);
+            return team.getMembers().contains(user);
         }
     }
 
@@ -89,4 +89,12 @@ public class AuthorizationService implements UserDetailsService {
         }
     }
 
+    public Object isUserEligibleToManageTeam(Principal principal, Team team) {
+        return isUserAdmin(principal) || getUserCredentials(principal).orElseThrow().equals(team.getTeamOwner());
+    }
+
+    public boolean isUserEligibleToSeeTeamDetails(Principal principal, Team team) {
+        User user = getUserCredentials(principal).orElseThrow();
+        return isUserAdmin(principal) || team.getMembers().contains(user);
+    }
 }

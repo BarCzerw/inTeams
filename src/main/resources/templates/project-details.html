@@ -47,7 +47,7 @@
                 <td><a th:href="@{'/task/delete/'+${task.getId()}}">Delete</a></td>
             </tr>
         </table>
-        <h4><a th:href="@{'/task/add?projectId=' + ${projectDetails.getId()}}">Add new task</a></h4>
+        <a th:href="@{/task/add(projectId=${projectDetails.getId()})}"><i class="material-icons hoverable" style="font-size: 50px;">add</i></a>
     </div>
 </main>
 <th:block th:replace="fragments :: scripts" th:remove="tag"/>
