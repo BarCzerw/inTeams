@@ -5,10 +5,8 @@ import com.sda.inTeams.model.Comment.Comment;
 import com.sda.inTeams.model.Project.Project;
 import com.sda.inTeams.model.Task.Task;
 import com.sda.inTeams.model.Task.TaskStatus;
-import com.sda.inTeams.service.AuthorizationService;
-import com.sda.inTeams.service.CommentService;
-import com.sda.inTeams.service.ProjectService;
-import com.sda.inTeams.service.TaskService;
+import com.sda.inTeams.model.User.User;
+import com.sda.inTeams.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @Controller
@@ -26,6 +25,7 @@ public class TaskController {
     private final TaskService taskService;
     private final ProjectService projectService;
     private final CommentService commentService;
+    private final UserService userService;
     private final AuthorizationService authorizationService;
 
     @GetMapping("/{id}")
@@ -50,12 +50,13 @@ public class TaskController {
     }
 
     @GetMapping("/add")
-    public String addTaskForm(Model model, @RequestParam(name = "projectId") long projectId) {
+    public String addTaskForm(Model model, Principal principal, @RequestParam(name = "projectId") long projectId) {
         try {
             Project taskOwner = projectService.getByIdOrThrow(projectId);
             model.addAttribute("newTask", new Task());
             model.addAttribute("ownerId", projectId);
             model.addAttribute("statuses", new ArrayList<>(List.of(TaskStatus.values())));
+            model.addAttribute("teamMembers", projectService.getAllMembers(taskOwner));
             return "task-add-form";
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
@@ -64,10 +65,11 @@ public class TaskController {
     }
 
     @PostMapping("/add")
-    public String addTask(Task task, long ownerId) {
+    public String addTask(Task task, long ownerId, long responsibleId) {
         try {
             //task.setStatus(task.getStatus());
             task.setProject(projectService.getByIdOrThrow(ownerId));
+            taskService.setUserResponsible(task.getId(),responsibleId);
             Task addedTask = taskService.add(task);
             return "redirect:/task/" + addedTask.getId();
         } catch (InvalidOperation invalidOperation) {
@@ -83,6 +85,7 @@ public class TaskController {
             model.addAttribute("newTask", taskToEdit);
             model.addAttribute("ownerId", taskToEdit.getProject().getId());
             model.addAttribute("statuses", new ArrayList<>(List.of(TaskStatus.values())));
+            model.addAttribute("teamMembers", projectService.getAllMembers(taskToEdit.getProject()));
             return "task-add-form";
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();

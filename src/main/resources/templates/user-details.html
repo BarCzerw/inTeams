@@ -60,6 +60,21 @@
         <td th:text="${team.getMembers().size()}"></td>
       </tr>
     </table>
+    <h2>Tasks responsible for</h2>
+    <table>
+      <tr>
+        <th>No.</th>
+        <th>Task description</th>
+        <th>Task status</th>
+        <th>Project</th>
+      </tr>
+      <tr th:each="task, index : ${tasksResponsibleFor}">
+        <td th:text="${index.index+1}"></td>
+        <td th:text="${task.getDescription()}"></td>
+        <td th:text="${task.getStatus().getTextRepresentation()}"></td>
+        <td th:text="${task.getProject().getName()}"></td>
+      </tr>
+    </table>
     <h2>Comments created</h2>
     <table>
       <tr>

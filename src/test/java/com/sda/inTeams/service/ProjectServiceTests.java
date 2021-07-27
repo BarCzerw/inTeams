@@ -7,10 +7,7 @@ import com.sda.inTeams.model.Project.ProjectStatus;
 import com.sda.inTeams.model.Task.Task;
 import com.sda.inTeams.model.Task.TaskStatus;
 import com.sda.inTeams.model.Team.Team;
-import com.sda.inTeams.repository.CommentRepository;
-import com.sda.inTeams.repository.ProjectRepository;
-import com.sda.inTeams.repository.TaskRepository;
-import com.sda.inTeams.repository.TeamRepository;
+import com.sda.inTeams.repository.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,14 +26,16 @@ public class ProjectServiceTests {
     private final TeamRepository teamRepository;
     private final TaskRepository taskRepository;
     private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public ProjectServiceTests(ProjectRepository projectRepository, TeamRepository teamRepository, TaskRepository taskRepository, CommentRepository commentRepository) {
+    public ProjectServiceTests(ProjectRepository projectRepository, TeamRepository teamRepository, TaskRepository taskRepository, CommentRepository commentRepository, UserRepository userRepository) {
         this.projectRepository = projectRepository;
         this.teamRepository = teamRepository;
         this.taskRepository = taskRepository;
         this.commentRepository = commentRepository;
-        this.taskService = new TaskService(taskRepository, projectRepository, commentRepository);
+        this.userRepository = userRepository;
+        this.taskService = new TaskService(taskRepository, projectRepository, commentRepository,teamRepository,userRepository);
         this.projectService = new ProjectService(projectRepository, teamRepository, taskRepository,taskService);
     }
 

@@ -3,6 +3,7 @@ package com.sda.inTeams.model.User;
 
 import com.sda.inTeams.model.Comment.Comment;
 import com.sda.inTeams.model.Indexable;
+import com.sda.inTeams.model.Task.Task;
 import com.sda.inTeams.model.Team.Team;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -51,6 +52,11 @@ public class User implements Indexable, UserDetails {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Set<Team> teams;
+
+    @OneToMany(mappedBy = "userResponsible", fetch = FetchType.EAGER)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private Set<Task> taskResponsibleFor;
 
     @OneToMany(mappedBy = "creator")
     @EqualsAndHashCode.Exclude

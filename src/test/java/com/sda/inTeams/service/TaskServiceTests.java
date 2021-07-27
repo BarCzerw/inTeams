@@ -4,9 +4,7 @@ import com.sda.inTeams.TestUtility;
 import com.sda.inTeams.exception.InvalidOperation;
 import com.sda.inTeams.model.Task.Task;
 import com.sda.inTeams.model.Task.TaskStatus;
-import com.sda.inTeams.repository.CommentRepository;
-import com.sda.inTeams.repository.ProjectRepository;
-import com.sda.inTeams.repository.TaskRepository;
+import com.sda.inTeams.repository.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,13 +22,17 @@ public class TaskServiceTests {
     private final TaskRepository taskRepository;
     private final ProjectRepository projectRepository;
     private final CommentRepository commentRepository;
+    private final TeamRepository teamRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public TaskServiceTests(TaskRepository taskRepository, ProjectRepository projectRepository, CommentRepository commentRepository) {
+    public TaskServiceTests(TaskRepository taskRepository, ProjectRepository projectRepository, CommentRepository commentRepository, TeamRepository teamRepository, UserRepository userRepository) {
         this.taskRepository = taskRepository;
         this.projectRepository = projectRepository;
         this.commentRepository = commentRepository;
-        this.taskService = new TaskService(taskRepository, projectRepository, commentRepository);
+        this.teamRepository = teamRepository;
+        this.userRepository = userRepository;
+        this.taskService = new TaskService(taskRepository, projectRepository, commentRepository, teamRepository, userRepository);
     }
 
     private Task addNewTaskToDatabase() {

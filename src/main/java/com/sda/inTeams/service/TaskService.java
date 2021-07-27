@@ -2,18 +2,16 @@ package com.sda.inTeams.service;
 
 import com.sda.inTeams.exception.InvalidOperation;
 import com.sda.inTeams.model.Comment.Comment;
+import com.sda.inTeams.model.Project.Project;
 import com.sda.inTeams.model.Task.Task;
 import com.sda.inTeams.model.Task.TaskStatus;
-import com.sda.inTeams.repository.CommentRepository;
-import com.sda.inTeams.repository.ProjectRepository;
-import com.sda.inTeams.repository.TaskRepository;
+import com.sda.inTeams.model.Team.Team;
+import com.sda.inTeams.model.User.User;
+import com.sda.inTeams.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +20,8 @@ public class TaskService implements DatabaseManageable<Task> {
     private final TaskRepository taskRepository;
     private final ProjectRepository projectRepository;
     private final CommentRepository commentRepository;
+    private final TeamRepository teamRepository;
+    private final UserRepository userRepository;
 
     public List<Task> getAll() {
         return taskRepository.findAll();
@@ -63,6 +63,18 @@ public class TaskService implements DatabaseManageable<Task> {
         taskRepository.delete(taskToDelete);
     }
 
+    public void setUserResponsible(long taskId, long userId) throws InvalidOperation {
+        Task task = getByIdOrThrow(taskId);
+        User user = userRepository.findById(userId).orElseThrow();
+
+        task.setUserResponsible(user);
+        List<Task> allByUserResponsible = taskRepository.findAllByUserResponsible(user);
+        allByUserResponsible.add(task);
+        user.setTaskResponsibleFor(new HashSet<>(allByUserResponsible));
+
+        saveToDatabase(task);
+    }
+
     public void addCommentToTask(long taskId, long commentId) throws InvalidOperation {
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new InvalidOperation("Task id:" + taskId + " not found!"));
         Comment commentToAdd = commentRepository.findById(taskId).orElseThrow(() -> new InvalidOperation("Comment id:" + commentId + " not found!"));
@@ -93,4 +105,13 @@ public class TaskService implements DatabaseManageable<Task> {
         return taskRepository.save(task);
     }
 
+    public List<User> getAllMembersByTask(Task task) {
+        Project project = projectRepository.findByTasksContaining(task).orElseThrow();
+        Team team = teamRepository.findByProjectsContaining(project).orElseThrow();
+        return new ArrayList<>(team.getMembers());
+    }
+
+    public List<Task> getAllTasksByUserResponsibleFor(User user) {
+        return taskRepository.findAllByUserResponsible(user);
+    }
 }

@@ -55,7 +55,6 @@ public class ProjectController {
     public String addProject(Project project, long ownerId) {
         try {
             project.setProjectOwner(teamService.getByIdOrThrow(ownerId));
-            //project.setStatus(project.getStatus());
             Project addedProject = projectService.add(project);
             return "redirect:/project/" + addedProject.getId();
         } catch (InvalidOperation invalidOperation) {
