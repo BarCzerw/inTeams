@@ -29,30 +29,24 @@ public class TaskController {
     private final AuthorizationService authorizationService;
 
     @GetMapping("/{id}")
-    public String getTask(Principal principal, Model model, @PathVariable(name = "id") long taskId) {
+    public String getTask(Model model, Principal principal, @PathVariable(name = "id") long taskId) {
         try {
-            model.addAttribute("taskDetails", taskService.getByIdOrThrow(taskId));
-            model.addAttribute("taskComments", commentService.getAllByTask(taskId));
-            model.addAttribute("newComment", new Comment());
-            model.addAttribute("ownerId", taskId);
-            model.addAttribute("creatorId", authorizationService.getUserCredentials(principal).get().getId());
-            model.addAttribute("isAdmin", authorizationService.isUserAdmin(principal));
-            return "task-details";
+            Task task = taskService.getByIdOrThrow(taskId);
+            if (authorizationService.isUserMemberOfTask(principal, task)) {
+                model.addAttribute("taskDetails", task);
+                model.addAttribute("taskComments", commentService.getAllByTask(taskId));
+                model.addAttribute("newComment", new Comment());
+                model.addAttribute("ownerId", taskId);
+                model.addAttribute("creatorId", authorizationService.getUserCredentials(principal).get().getId());
+                model.addAttribute("isAdmin", authorizationService.isUserAdmin(principal));
+                return "task-details";
+            } else {
+                //unauthorized access
+            }
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
-            return "task-list";
         }
-    }
-
-    @GetMapping("/team")
-    public String getProjectTasks(Model model, @RequestParam(name = "teamId") long teamId) {
-        try {
-            model.addAttribute("taskList", taskService.getAllTasksOfTeam(teamId));
-            return "task-list";
-        } catch (InvalidOperation invalidOperation) {
-            invalidOperation.printStackTrace();
-            return "redirect:/";
-        }
+        return "redirect:/";
     }
 
     @GetMapping("/add")

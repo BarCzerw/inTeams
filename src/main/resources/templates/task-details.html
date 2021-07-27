@@ -9,7 +9,9 @@
 <th:block th:replace="fragments :: navigator" th:remove="tag"/>
 <main>
     <div class="container">
-        <h2>Task</h2>
+        <div>
+            <h2>Task<a th:href="@{'/task/edit' + ${taskDetails.getId()}}"><i class="material-icons hoverable">edit</i></a></h2>
+        </div>
         <table>
             <tr>
                 <td>Task Id</td>
@@ -52,7 +54,6 @@
             <input type="text" th:field="*{text}" placeholder="Your comment">
             <button type="submit">Submit comment</button>
         </form>
-        <h4><a th:href="@{/comment/add(taskId=${taskDetails.getId()},userId='1')}">Add new comment</a></h4>
     </div>
 </main>
 <th:block th:replace="fragments :: scripts" th:remove="tag"/>
