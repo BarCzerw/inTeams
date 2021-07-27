@@ -87,13 +87,12 @@ public class UserController {
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteTeam(@PathVariable(name = "id") long userId) {
+    public String deleteUser(@PathVariable(name = "id") long userId) {
         try {
-            User userToDelete = userService.getByIdOrThrow(userId);
             userService.delete(userId);
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
         }
-        return "redirect:/user/all";
+        return "redirect:/";
     }
 }
