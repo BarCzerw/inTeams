@@ -44,6 +44,11 @@
                 </td>
             </tr>
         </table>
+        <form th:action="@{~/team/invite}" method="post">
+            <input type="number" hidden th:name="teamId" th:value="${teamDetails.getId()}">
+            <input type="text" th:name="invitationCode" placeholder="Invitation code">
+            <button class="btn waves-effect waves-light" type="submit">Invite user<i class="material-icons right">send</i></button>
+        </form>
         <h2>Projects</h2>
         <table>
             <tr>

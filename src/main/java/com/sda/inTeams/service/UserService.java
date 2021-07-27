@@ -82,4 +82,7 @@ public class UserService implements DatabaseManageable<User> {
         return userRepository.findAllByTeamsContaining(team);
     }
 
+    public User getByInvitationCodeOrThrow(String invitationCode) throws InvalidOperation {
+        return userRepository.findByUniqueInvitationId(invitationCode).orElseThrow(() -> new InvalidOperation("User not found!"));
+    }
 }
