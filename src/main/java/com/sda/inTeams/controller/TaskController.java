@@ -32,7 +32,7 @@ public class TaskController {
     public String getTask(Model model, Principal principal, @PathVariable(name = "id") long taskId) {
         try {
             Task task = taskService.getByIdOrThrow(taskId);
-            if (authorizationService.isUserMemberOfTask(principal, task)) {
+            if (authorizationService.isUserEligibleToSeeTaskDetails(principal, task)) {
                 model.addAttribute("taskDetails", task);
                 model.addAttribute("taskComments", commentService.getAllByTask(taskId));
                 model.addAttribute("newComment", new Comment());

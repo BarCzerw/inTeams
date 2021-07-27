@@ -33,14 +33,14 @@ public class AuthorizationService implements UserDetailsService {
         if (accountOptional.isPresent()) {
             return accountOptional.get();
         }
-        throw new  UsernameNotFoundException("Cannot find username:" + username);
+        throw new UsernameNotFoundException("Cannot find username:" + username);
     }
 
     public Optional<User> getUserCredentials(Principal principal) {
         if (principal instanceof UsernamePasswordAuthenticationToken) {
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = (UsernamePasswordAuthenticationToken) principal;
             if (usernamePasswordAuthenticationToken.getPrincipal() instanceof User) {
-                return  Optional.of((User) usernamePasswordAuthenticationToken.getPrincipal());
+                return Optional.of((User) usernamePasswordAuthenticationToken.getPrincipal());
             }
         }
         return Optional.empty();
@@ -57,21 +57,25 @@ public class AuthorizationService implements UserDetailsService {
     }
 
     public boolean isUserEligibleToDeleteComment(Principal principal, Comment comment) {
-        return isUserCommentCreator(principal,comment) || isUserAdmin(principal);
+        return isUserCommentCreator(principal, comment) || isUserAdmin(principal);
     }
 
     public boolean isUserEligibleToEditComment(Principal principal, Comment comment) {
-        return isUserCommentCreator(principal,comment) || isUserAdmin(principal);
+        return isUserCommentCreator(principal, comment) || isUserAdmin(principal);
     }
 
     private boolean isUserCommentCreator(Principal principal, Comment comment) {
         return getUserCredentials(principal).orElseThrow().equals(comment.getCreator());
     }
 
-    public boolean isUserMemberOfTask(Principal principal, Task task) {
-        User user = getUserCredentials(principal).orElseThrow();
-        Project project = projectRepository.findByTasksContaining(task).orElseThrow();
-        Team team = teamRepository.findByProjectsContaining(project).orElseThrow();
-        return userRepository.findAllByTeamsContaining(team).contains(user);
+    public boolean isUserEligibleToSeeTaskDetails(Principal principal, Task task) {
+        if (isUserAdmin(principal)) {
+            return true;
+        } else {
+            User user = getUserCredentials(principal).orElseThrow();
+            Project project = projectRepository.findByTasksContaining(task).orElseThrow();
+            Team team = teamRepository.findByProjectsContaining(project).orElseThrow();
+            return userRepository.findAllByTeamsContaining(team).contains(user);
+        }
     }
 }
