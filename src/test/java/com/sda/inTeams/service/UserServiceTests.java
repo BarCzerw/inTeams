@@ -4,10 +4,7 @@ import com.sda.inTeams.TestUtility;
 import com.sda.inTeams.exception.InvalidOperation;
 import com.sda.inTeams.model.Team.Team;
 import com.sda.inTeams.model.User.User;
-import com.sda.inTeams.repository.AccountRoleRepository;
-import com.sda.inTeams.repository.ProjectRepository;
-import com.sda.inTeams.repository.TeamRepository;
-import com.sda.inTeams.repository.UserRepository;
+import com.sda.inTeams.repository.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,17 +25,19 @@ public class UserServiceTests {
     private final UserService userService;
     private final ProjectRepository projectRepository;
     private final AccountRoleRepository accountRoleRepository;
+    private final CommentRepository commentRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceTests(UserRepository userRepository, TeamRepository teamRepository, ProjectRepository projectRepository, AccountRoleRepository accountRoleRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceTests(UserRepository userRepository, TeamRepository teamRepository, ProjectRepository projectRepository, AccountRoleRepository accountRoleRepository, CommentRepository commentRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.teamRepository = teamRepository;
         this.projectRepository = projectRepository;
         this.accountRoleRepository = accountRoleRepository;
+        this.commentRepository = commentRepository;
         this.passwordEncoder = passwordEncoder;
         this.teamService = new TeamService(teamRepository, userRepository, projectRepository);
-        this.userService = new UserService(userRepository, teamRepository,accountRoleRepository,passwordEncoder);
+        this.userService = new UserService(userRepository, teamRepository,commentRepository,teamService,accountRoleRepository,passwordEncoder);
     }
 
     @Test

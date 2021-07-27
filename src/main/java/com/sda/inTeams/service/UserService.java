@@ -1,11 +1,13 @@
 package com.sda.inTeams.service;
 
 import com.sda.inTeams.exception.InvalidOperation;
+import com.sda.inTeams.model.Comment.Comment;
 import com.sda.inTeams.model.Team.Team;
 import com.sda.inTeams.model.User.User;
 import com.sda.inTeams.model.dto.RegisterDto;
 import com.sda.inTeams.model.dto.RegisterTeamDTO;
 import com.sda.inTeams.repository.AccountRoleRepository;
+import com.sda.inTeams.repository.CommentRepository;
 import com.sda.inTeams.repository.TeamRepository;
 import com.sda.inTeams.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,8 @@ public class UserService implements DatabaseManageable<User> {
 
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
+    private final CommentRepository commentRepository;
+    private final TeamService teamService;
     private final AccountRoleRepository accountRoleRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -47,6 +51,16 @@ public class UserService implements DatabaseManageable<User> {
         if (!teamRepository.findAllByTeamOwner(user).isEmpty()) {
             throw new InvalidOperation("Cannot remove user id:" + user.getId() + " - User is still owner of a Team");
         }
+        List<Team> userTeams = teamRepository.findAllByMembersContaining(user);
+        for (Team userTeam : userTeams) {
+            teamService.removeUserFromTeam(userTeam.getId(), userId);
+        }
+        user.setTeams(new HashSet<>());
+        List<Comment> userComments = commentRepository.findAllByCreator(user);
+        for (Comment userComment : userComments) {
+            userComment.setCreator(null);
+        }
+        user.setCommentsCreated(new HashSet<>());
         userRepository.delete(user);
     }
 
