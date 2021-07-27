@@ -1,18 +1,20 @@
 package com.sda.inTeams.controller;
 
 import com.sda.inTeams.exception.InvalidOperation;
+import com.sda.inTeams.model.Comment.Comment;
 import com.sda.inTeams.model.Project.Project;
 import com.sda.inTeams.model.Task.Task;
 import com.sda.inTeams.model.Task.TaskStatus;
+import com.sda.inTeams.service.AuthorizationService;
 import com.sda.inTeams.service.CommentService;
 import com.sda.inTeams.service.ProjectService;
 import com.sda.inTeams.service.TaskService;
-import com.sda.inTeams.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,37 +24,29 @@ import java.util.List;
 public class TaskController {
 
     private final TaskService taskService;
-    private final TeamService teamService;
     private final ProjectService projectService;
     private final CommentService commentService;
-
-    @GetMapping("/all")
-    public String getAllTasks(Model model) {
-        model.addAttribute("taskList", taskService.getAll());
-        return "task-list";
-    }
+    private final AuthorizationService authorizationService;
 
     @GetMapping("/{id}")
-    public String getTask(Model model, @PathVariable(name = "id") long taskId) {
+    public String getTask(Model model, Principal principal, @PathVariable(name = "id") long taskId) {
         try {
-            model.addAttribute("taskDetails", taskService.getByIdOrThrow(taskId));
-            model.addAttribute("taskComments", commentService.getAllByTask(taskId));
-            return "task-details";
+            Task task = taskService.getByIdOrThrow(taskId);
+            if (authorizationService.isUserEligibleToSeeTaskDetails(principal, task)) {
+                model.addAttribute("taskDetails", task);
+                model.addAttribute("taskComments", commentService.getAllByTask(taskId));
+                model.addAttribute("newComment", new Comment());
+                model.addAttribute("ownerId", taskId);
+                model.addAttribute("creatorId", authorizationService.getUserCredentials(principal).get().getId());
+                model.addAttribute("isAdmin", authorizationService.isUserAdmin(principal));
+                return "task-details";
+            } else {
+                //unauthorized access
+            }
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
-            return "task-list";
         }
-    }
-
-    @GetMapping("/team")
-    public String getProjectTasks(Model model, @RequestParam(name = "teamId") long teamId) {
-        try {
-            model.addAttribute("taskList", taskService.getAllTasksOfTeam(teamId));
-            return "task-list";
-        } catch (InvalidOperation invalidOperation) {
-            invalidOperation.printStackTrace();
-            return getAllTasks(model);
-        }
+        return "redirect:/";
     }
 
     @GetMapping("/add")

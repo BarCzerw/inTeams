@@ -10,8 +10,8 @@
 <main>
     <div class="container">
         <h2>Teams</h2>
-        <h4><a th:href="@{/team/add(userId=1)}">Add new team</a></h4>
-        <table>
+        <table class="centered highlight">
+            <thead>
             <tr>
                 <th>No.</th>
                 <th>Name</th>
@@ -21,15 +21,18 @@
                 <th>Edit</th>
                 <th>Remove</th>
             </tr>
+            </thead>
+            <tbody>
             <tr th:each="team, index : ${teamList}">
                 <td th:text="${index.index+1}"></td>
                 <td th:text="${team.getName()}"></td>
                 <td th:text="${team.getMembers().size()}"></td>
                 <td th:text="${team.getProjects().size()}"></td>
-                <td><a th:href="@{'/team/'+${team.getId()}}">Details</a></td>
-                <td><a th:href="@{'/team/edit/'+${team.getId()}}">Edit</a></td>
-                <td><a th:href="@{'/team/delete/'+${team.getId()}}">Delete</a></td>
+                <td><a th:href="@{'/team/'+${team.getId()}}"><i class="material-icons">zoom_in</i></a></td>
+                <td><a th:href="@{'/team/edit/'+${team.getId()}}"><i class="material-icons">edit</i></a></td>
+                <td><a th:href="@{'/team/delete/'+${team.getId()}}"><i class="material-icons">delete</i></a></td>
             </tr>
+            </tbody>
         </table>
     </div>
 </main>

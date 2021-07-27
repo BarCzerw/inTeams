@@ -10,7 +10,8 @@
 <main>
     <div class="container">
         <h2>Comments</h2>
-        <table>
+        <table class="centered highlight">
+            <thead>
             <tr>
                 <th>No.</th>
                 <th>Text</th>
@@ -18,13 +19,16 @@
                 <th>Edit</th>
                 <th>Remove</th>
             </tr>
+            </thead>
+            <tbody>
             <tr th:each="comment, index : ${commentList}">
                 <td th:text="${index.index+1}"></td>
                 <td th:text="${comment.getText()}"></td>
                 <td th:text="${comment.getCreator().getFirstName() + ' ' + comment.getCreator().getLastName()}"></td>
-                <td><a th:href="@{'/comment/edit/'+${comment.getId()}}">Edit</a></td>
-                <td><a th:href="@{'/comment/delete/'+${comment.getId()}}">Delete</a></td>
+                <td><a th:href="@{'/comment/edit/'+${comment.getId()}}"><i class="material-icons">edit</i></a></td>
+                <td><a th:href="@{'/comment/delete/'+${comment.getId()}}"><i class="material-icons">delete</i></a></td>
             </tr>
+            </tbody>
         </table>
     </div>
 </main>

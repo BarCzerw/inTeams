@@ -7,6 +7,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Data
@@ -18,6 +19,8 @@ public class Team implements Indexable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+
+    private final String uniqueRegisterId = UUID.randomUUID().toString().replace("-","");
 
     private String name;
 

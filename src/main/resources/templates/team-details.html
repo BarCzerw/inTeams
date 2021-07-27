@@ -9,7 +9,7 @@
 <th:block th:replace="fragments :: navigator" th:remove="tag"/>
 <main>
     <div class="container">
-        <h2>Team</h2>
+        <h2>Team<a th:if="${canManageTeam}" th:href="@{'/team/edit/' + ${teamDetails.getId()}}"><i class="material-icons hoverable">edit</i></a></h2>
         <table>
             <tr>
                 <td>Team Id</td>
@@ -22,6 +22,10 @@
             <tr>
                 <td>Team owner</td>
                 <td th:text="${teamDetails.getTeamOwner().getFirstName() + ' ' + teamDetails.getTeamOwner().getLastName()}"></td>
+            </tr>
+            <tr th:if="${canManageTeam}">
+                <td>Register link</td>
+                <td><a th:href="@{~/register/user(teamId=${teamDetails.getId()},registerCode=${teamDetails.getUniqueRegisterId()})}">Register</a></td>
             </tr>
         </table>
         <h2>Members</h2>
@@ -36,7 +40,7 @@
                 <td th:text="${index.index+1}"></td>
                 <td th:text="${member.getFirstName()}"></td>
                 <td th:text="${member.getLastName()}"></td>
-                <td><a th:href="@{~/team/removeUser(teamId=${teamDetails.getId()},userId=${member.getId()})}">Remove</a>
+                <td th:if="${canManageTeam || userId == member.getId()}"><a th:href="@{~/team/removeUser(teamId=${teamDetails.getId()},userId=${member.getId()})}">Remove</a>
                 </td>
             </tr>
         </table>
@@ -47,7 +51,6 @@
                 <th>Name</th>
                 <th>Status</th>
                 <th>Show detailed</th>
-                <th>Edit</th>
                 <th>Remove</th>
             </tr>
             <tr th:each="prj, index : ${teamProjects}">
@@ -55,11 +58,10 @@
                 <td th:text="${prj.getName()}"></td>
                 <td th:text="${prj.getStatus().getTextRepresentation()}"></td>
                 <td><a th:href="@{'/project/'+${prj.getId()}}">Details</a></td>
-                <td><a th:href="@{'/project/edit/'+${prj.getId()}}">Edit</a></td>
-                <td><a th:href="@{'/project/delete/'+${prj.getId()}}">Delete</a></td>
+                <td><a th:if="${canManageTeam}" th:href="@{'/project/delete/'+${prj.getId()}}">Delete</a></td>
             </tr>
         </table>
-        <h4><a th:href="@{'/project/add?teamId=' + ${teamDetails.getId()}}">Add new project</a></h4>
+        <a th:href="@{/project/add(teamId=${teamDetails.getId()})}"><i class="material-icons hoverable" style="font-size: 50px;">add</i></a>
     </div>
 </main>
 <th:block th:replace="fragments :: scripts" th:remove="tag"/>

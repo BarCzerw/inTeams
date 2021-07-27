@@ -10,8 +10,8 @@
 <main>
     <div class="container">
         <h2>Users</h2>
-        <h4><a th:href="@{~/register/user}">Register new user</a></h4>
-        <table>
+        <table class="centered highlight">
+            <thead>
             <tr>
                 <th>No.</th>
                 <th>First name</th>
@@ -20,14 +20,18 @@
                 <th>Edit</th>
                 <th>Remove</th>
             </tr>
+            </thead>
+            <tbody>
+            </tbody>
             <tr th:each="usr, index : ${userList}">
                 <td th:text="${index.index+1}"></td>
                 <td th:text="${usr.getFirstName()}"></td>
                 <td th:text="${usr.getLastName()}"></td>
-                <td><a th:href="@{'/user/'+${usr.getId()}}">Details</a></td>
-                <td><a th:href="@{'/user/edit/'+${usr.getId()}}">Edit</a></td>
-                <td><a th:href="@{'/user/delete/'+${usr.getId()}}">Delete</a></td>
+                <td><a th:href="@{'/user/'+${usr.getId()}}"><i class="material-icons">zoom_in</i></a></td>
+                <td><a th:href="@{'/user/edit/'+${usr.getId()}}"><i class="material-icons">edit</i></a></td>
+                <td><a th:href="@{'/user/delete/'+${usr.getId()}}"><i class="material-icons">delete</i></a></td>
             </tr>
+            </tbody>
         </table>
     </div>
 </main>

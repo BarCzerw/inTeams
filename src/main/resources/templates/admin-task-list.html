@@ -10,7 +10,8 @@
 <main>
     <div class="container">
         <h2>Tasks</h2>
-        <table>
+        <table class="centered highlight">
+            <thead>
             <tr>
                 <th>No.</th>
                 <th>Description</th>
@@ -19,14 +20,17 @@
                 <th>Edit</th>
                 <th>Remove</th>
             </tr>
+            </thead>
+            <tbody>
             <tr th:each="task, index : ${taskList}">
                 <td th:text="${index.index+1}"></td>
                 <td th:text="${task.getDescription()}"></td>
                 <td th:text="${task.getStatus().getTextRepresentation()}"></td>
-                <td><a th:href="@{'/task/'+${task.getId()}}">Details</a></td>
-                <td><a th:href="@{'/task/edit/'+${task.getId()}}">Edit</a></td>
-                <td><a th:href="@{'/task/delete/'+${task.getId()}}">Delete</a></td>
+                <td><a th:href="@{'/task/'+${task.getId()}}"><i class="material-icons">zoom_in</i></a></td>
+                <td><a th:href="@{'/task/edit/'+${task.getId()}}"><i class="material-icons">edit</i></a></td>
+                <td><a th:href="@{'/task/delete/'+${task.getId()}}"><i class="material-icons">delete</i></a></td>
             </tr>
+            </tbody>
         </table>
     </div>
 </main>

@@ -10,7 +10,8 @@
 <main>
     <div class="container">
         <h2>Projects</h2>
-        <table>
+        <table class="centered highlight">
+            <thead>
             <tr>
                 <th>No.</th>
                 <th>Name</th>
@@ -20,15 +21,20 @@
                 <th>Edit</th>
                 <th>Remove</th>
             </tr>
+            </thead>
+            <tbody>
             <tr th:each="prj, index : ${projectList}">
                 <td th:text="${index.index+1}"></td>
                 <td th:text="${prj.getName()}"></td>
                 <td th:text="${prj.getProjectOwner().getName()}"></td>
                 <td th:text="${prj.getStatus().getTextRepresentation()}"></td>
-                <td><a th:href="@{'/project/'+${prj.getId()}}">Details</a></td>
-                <td><a th:href="@{'/project/edit/'+${prj.getId()}}">Edit</a></td>
-                <td><a th:href="@{'/project/delete/'+${prj.getId()}}">Delete</a></td>
+                <td><a th:href="@{'/project/'+${prj.getId()}}"><i class="material-icons">zoom_in</i></a></td>
+                <td><a th:href="@{'/project/edit/'+${prj.getId()}}"><i class="material-icons">edit</i></a></td>
+                <td><a th:href="@{'/project/delete/'+${prj.getId()}}">
+                    <i class="material-icons">delete</i>
+                </a></td>
             </tr>
+            </tbody>
         </table>
     </div>
 </main>
