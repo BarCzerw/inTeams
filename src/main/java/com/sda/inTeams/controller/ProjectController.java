@@ -3,7 +3,7 @@ package com.sda.inTeams.controller;
 import com.sda.inTeams.exception.InvalidOperation;
 import com.sda.inTeams.model.Project.Project;
 import com.sda.inTeams.model.Project.ProjectStatus;
-import com.sda.inTeams.model.Team.Team;
+import com.sda.inTeams.service.AuthorizationService;
 import com.sda.inTeams.service.ProjectService;
 import com.sda.inTeams.service.TaskService;
 import com.sda.inTeams.service.TeamService;
@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,20 +24,27 @@ public class ProjectController {
     private final ProjectService projectService;
     private final TeamService teamService;
     private final TaskService taskService;
+    private final AuthorizationService authorizationService;
 
     @GetMapping("/{id}")
-    public String getProject(Model model, @PathVariable(name = "id") long projectId) {
+    public String getProject(Model model, Principal principal, @PathVariable(name = "id") long projectId) {
         try {
-            model.addAttribute("projectDetails", projectService.getByIdOrThrow(projectId));
-            model.addAttribute("projectTasks", taskService.getAllTasksOfTeam(projectId));
-            return "project-details";
+            Project project = projectService.getByIdOrThrow(projectId);
+            if (authorizationService.isUserEligibleToSeeProjectDetails(principal, project)) {
+                model.addAttribute("projectDetails", projectService.getByIdOrThrow(projectId));
+                model.addAttribute("projectTasks", taskService.getAllTasksOfTeam(projectId));
+                return "project-details";
+            } else {
+                //unauthorized access
+            }
         } catch (InvalidOperation invalidOperation) {
-            return "redirect:/project/all";
+            invalidOperation.printStackTrace();
         }
+        return "redirect:/";
     }
 
     @GetMapping("/add")
-    public String addProjectForm(Model model, @RequestParam(name="teamId") long teamId) {
+    public String addProjectForm(Model model, @RequestParam(name = "teamId") long teamId) {
         model.addAttribute("newProject", new Project());
         model.addAttribute("teamId", teamId);
         model.addAttribute("statuses", new ArrayList<>(List.of(ProjectStatus.values())));

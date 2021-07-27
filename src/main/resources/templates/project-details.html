@@ -9,7 +9,7 @@
 <th:block th:replace="fragments :: navigator" th:remove="tag"/>
 <main>
     <div class="container">
-        <h2>Project</h2>
+        <h2>Project<a th:href="@{'/project/edit/' + ${projectDetails.getId()}}"><i class="material-icons hoverable">edit</i></a></h2>
         <table th:object="${projectDetails}">
             <tr>
                 <td>Project Id</td>
@@ -20,12 +20,12 @@
                 <td th:text="*{getName()}"></td>
             </tr>
             <tr>
-                <td>Owner</td>
-                <td th:text="*{getProjectOwner().getName()}"></td>
-            </tr>
-            <tr>
                 <td>Status</td>
                 <td th:text="*{getStatus().getTextRepresentation()}"></td>
+            </tr>
+            <tr>
+                <td>Team</td>
+                <td><a th:href="@{'/team/' + *{getProjectOwner().getId()}}" th:text="*{getProjectOwner().getName()}"></a></td>
             </tr>
         </table>
         <h2>Tasks</h2>

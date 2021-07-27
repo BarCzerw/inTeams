@@ -78,4 +78,15 @@ public class AuthorizationService implements UserDetailsService {
             return userRepository.findAllByTeamsContaining(team).contains(user);
         }
     }
+
+    public boolean isUserEligibleToSeeProjectDetails(Principal principal, Project project) {
+        if (isUserAdmin(principal)) {
+            return true;
+        } else {
+            User user = getUserCredentials(principal).orElseThrow();
+            Team team = teamRepository.findByProjectsContaining(project).orElseThrow();
+            return userRepository.findAllByTeamsContaining(team).contains(user);
+        }
+    }
+
 }

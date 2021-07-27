@@ -10,7 +10,7 @@
 <main>
     <div class="container">
         <div>
-            <h2>Task<a th:href="@{'/task/edit' + ${taskDetails.getId()}}"><i class="material-icons hoverable">edit</i></a></h2>
+            <h2>Task<a th:href="@{'/task/edit/' + ${taskDetails.getId()}}"><i class="material-icons hoverable">edit</i></a></h2>
         </div>
         <table>
             <tr>
@@ -27,7 +27,7 @@
             </tr>
             <tr>
                 <td>Project</td>
-                <td><a th:href="@{'/project/' + ${taskDetails.getProject().getId()}}">Go back to project</a></td>
+                <td><a th:href="@{'/project/' + ${taskDetails.getProject().getId()}}" th:text="${taskDetails.getProject().getName()}"></a></td>
             </tr>
         </table>
         <h2>Comments</h2>
