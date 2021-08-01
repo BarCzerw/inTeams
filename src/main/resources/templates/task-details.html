@@ -27,7 +27,7 @@
             </tr>
             <tr>
                 <td>Member responsible</td>
-                <td th:text="${taskDetails.getUserResponsible().getFirstName() + ' ' + taskDetails.getUserResponsible().getLastName()}"></td>
+                <td th:text="${taskDetails.getUserResponsible() != null ? (taskDetails.getUserResponsible().getFirstName() + ' ' + taskDetails.getUserResponsible().getLastName()) : 'Account deleted'}"></td>
             </tr>
             <tr>
                 <td>Project</td>
