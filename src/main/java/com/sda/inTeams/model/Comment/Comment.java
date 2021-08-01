@@ -23,7 +23,7 @@ public class Comment implements Indexable {
 
     private String text;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     private User creator;
 
     @ManyToOne

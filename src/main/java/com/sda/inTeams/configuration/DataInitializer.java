@@ -50,6 +50,7 @@ public class DataInitializer implements ApplicationListener<ContextRefreshedEven
 
     private void generateInitialDatabase() {
         List<Team> teams = TeamGenerator.generateTeams(6);
+        teamRepository.saveAll(teams);
 
         for (Team team : teams) {
             List<User> users = UserGenerator.generateUsers(8);
@@ -64,10 +65,13 @@ public class DataInitializer implements ApplicationListener<ContextRefreshedEven
                 for (Task task : tasks) {
                     List<Comment> comments = CommentGenerator.generateComments(3);
                     connectTaskAndComments(task, comments);
+                    connectTaskAndUser(task,users);
                 }
+                //taskRepository.saveAll(tasks);
+                //userRepository.saveAll(users);
             }
         }
-        teamRepository.saveAll(teams);
+        //teamRepository.saveAll(teams);
     }
 
     private void generateComments() {
@@ -82,10 +86,11 @@ public class DataInitializer implements ApplicationListener<ContextRefreshedEven
                 for (Task task : tasks) {
                     List<Comment> comments = commentRepository.findAllByTask(task);
                     for (Comment comment : comments) {
+                        users = userRepository.findAllByTeamsContaining(team);
                         connectCommentAndUser(comment, users);
                     }
-                    commentRepository.saveAll(comments);
-                    userRepository.saveAll(users);
+                    //commentRepository.saveAll(comments);
+                    //userRepository.saveAll(users);
                 }
             }
         }
@@ -94,27 +99,31 @@ public class DataInitializer implements ApplicationListener<ContextRefreshedEven
     private void connectTeamAndUsers(Team team, List<User> userList) {
         team.setMembers(new HashSet<>(userList));
         team.setTeamOwner(UserGenerator.pickRandomUserFromList(userList));
+        teamRepository.save(team);
     }
 
     private void connectTeamAndProjects(Team team, List<Project> teamProjects) {
-        team.setProjects(new HashSet<>(teamProjects));
+        //team.setProjects(new HashSet<>(teamProjects));
         for (Project teamProject : teamProjects) {
             teamProject.setProjectOwner(team);
         }
+        projectRepository.saveAll(teamProjects);
     }
 
     private void connectProjectAndTasks(Project project, List<Task> taskList) {
-        project.setTasks(new HashSet<>(taskList));
+        //project.setTasks(new HashSet<>(taskList));
         for (Task projectTask : taskList) {
             projectTask.setProject(project);
         }
+        taskRepository.saveAll(taskList);
     }
 
     private void connectTaskAndComments(Task task, List<Comment> commentList) {
-        task.setComments(new HashSet<>(commentList));
+        //task.setComments(new HashSet<>(commentList));
         for (Comment comment : commentList) {
             comment.setTask(task);
         }
+        commentRepository.saveAll(commentList);
     }
 
     private void connectCommentAndUser(Comment comment, List<User> teamUsers) {
@@ -123,6 +132,16 @@ public class DataInitializer implements ApplicationListener<ContextRefreshedEven
         List<Comment> userComments = commentRepository.findAllByCreator(user);
         userComments.add(comment);
         user.setCommentsCreated(new HashSet<>(userComments));
+        commentRepository.save(comment);
+    }
+
+    private void connectTaskAndUser(Task task, List<User> teamUsers) {
+        User user = UserGenerator.pickRandomUserFromList(teamUsers);
+        task.setUserResponsible(user);
+        //List<Task> userTasks = taskRepository.findAllByUserResponsible(user);
+        //userTasks.add(task);
+        //user.setTaskResponsibleFor(new HashSet<>(userTasks));
+        taskRepository.save(task);
     }
 
     private void addUser(String username, String password, String[] roles) {

@@ -55,6 +55,7 @@ public class TaskController {
             Project taskOwner = projectService.getByIdOrThrow(projectId);
             model.addAttribute("newTask", new Task());
             model.addAttribute("ownerId", projectId);
+            model.addAttribute("responsibleId", -1);
             model.addAttribute("statuses", new ArrayList<>(List.of(TaskStatus.values())));
             model.addAttribute("teamMembers", projectService.getAllMembers(taskOwner));
             return "task-add-form";
@@ -69,8 +70,8 @@ public class TaskController {
         try {
             //task.setStatus(task.getStatus());
             task.setProject(projectService.getByIdOrThrow(ownerId));
-            taskService.setUserResponsible(task.getId(),responsibleId);
             Task addedTask = taskService.add(task);
+            taskService.setUserResponsible(task.getId(),responsibleId);
             return "redirect:/task/" + addedTask.getId();
         } catch (InvalidOperation invalidOperation) {
             invalidOperation.printStackTrace();
@@ -84,6 +85,7 @@ public class TaskController {
             Task taskToEdit = taskService.getByIdOrThrow(taskId);
             model.addAttribute("newTask", taskToEdit);
             model.addAttribute("ownerId", taskToEdit.getProject().getId());
+            model.addAttribute("responsibleId", taskToEdit.getUserResponsible().getId());
             model.addAttribute("statuses", new ArrayList<>(List.of(TaskStatus.values())));
             model.addAttribute("teamMembers", projectService.getAllMembers(taskToEdit.getProject()));
             return "task-add-form";
