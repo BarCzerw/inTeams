@@ -17,7 +17,7 @@
             <select th:field="*{status}" class="browser-default">
                 <option th:each="stat : ${statuses}" th:text="${stat.getTextRepresentation()}" th:value="${stat}"></option>
             </select>
-            <select th:name="responsibleId" th:value="" class="browser-default">
+            <select th:name="responsibleId" class="browser-default">
                 <option th:each="member : ${teamMembers}" th:text="${member.getFirstName() + ' ' + member.getLastName()}" th:value="${member.getId()}" th:selected="${member.getId() == responsibleId}"></option>
             </select>
             <button class="btn waves-effect waves-light" type="submit">Submit task<i class="material-icons right">send</i></button>
