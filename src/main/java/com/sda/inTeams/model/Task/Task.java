@@ -31,7 +31,7 @@ public class Task implements Indexable {
     @ManyToOne(cascade = CascadeType.PERSIST)
     private User userResponsible;
 
-    @OneToMany(mappedBy = "task", fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
+    @OneToMany(mappedBy = "task")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Set<Comment> comments;

@@ -20,6 +20,8 @@ import java.util.*;
 @RequiredArgsConstructor
 public class DataInitializer implements ApplicationListener<ContextRefreshedEvent> {
 
+    private static final boolean INITIALIZE_ON_STARTUP = true;
+
     private static final String ROLE_ADMIN = "ROLE_ADMIN";
     private static final String ROLE_USER = "ROLE_USER";
     private static final String[] AVAILABLE_ROLES = {ROLE_ADMIN, ROLE_USER};
@@ -39,17 +41,19 @@ public class DataInitializer implements ApplicationListener<ContextRefreshedEven
         }
         addUser("admin", "admin", new String[]{ROLE_ADMIN});
         addUser("user", "user", new String[]{ROLE_USER});
-        generateTeamsAndUsers();
-        generateProjects();
-        generateTasks();
-        generateComments();
+        if (INITIALIZE_ON_STARTUP) {
+            generateTeamsAndUsers();
+            generateProjects();
+            generateTasks();
+            generateComments();
+        }
     }
 
     private void generateTeamsAndUsers() {
         List<Team> teams = TeamGenerator.generateTeams(6);
         for (Team team : teams) {
             List<User> users = UserGenerator.generateUsers(6);
-            connectTeamAndUsers(team,users);
+            connectTeamAndUsers(team, users);
         }
         teamRepository.saveAll(teams);
     }
@@ -76,10 +80,10 @@ public class DataInitializer implements ApplicationListener<ContextRefreshedEven
             List<Project> projects = projectRepository.saveAll(teamProjects);
 
             for (Project project : projects) {
-                ArrayList<Task> tasks = new ArrayList<>(project.getTasks());
+                ArrayList<Task> tasks = new ArrayList<>(taskRepository.findAllByProject(project));
                 for (Task task : tasks) {
-                    List<User> teamMembers = new ArrayList<>(team.getMembers());
-                    connectTaskAndUser(task,teamMembers);
+                    List<User> teamMembers = new ArrayList<>(userRepository.findAllByTeamsContaining(team));
+                    connectTaskAndUser(task, teamMembers);
                     userRepository.saveAll(teamMembers);
                 }
                 taskRepository.saveAll(tasks);
@@ -92,10 +96,10 @@ public class DataInitializer implements ApplicationListener<ContextRefreshedEven
     private void generateComments() {
         List<Team> teamList = teamRepository.findAll();
         for (Team team : teamList) {
-            List<User> users = new ArrayList<>(team.getMembers());
-            List<Project> projects = new ArrayList<>(team.getProjects());
+            List<User> users = new ArrayList<>(userRepository.findAllByTeamsContaining(team));
+            List<Project> projects = new ArrayList<>(projectRepository.findAllByProjectOwner(team));
             for (Project project : projects) {
-                List<Task> taskList = new ArrayList<>(project.getTasks());
+                List<Task> taskList = new ArrayList<>(taskRepository.findAllByProject(project));
                 for (Task task : taskList) {
                     List<Comment> comments = CommentGenerator.generateComments(5);
                     connectTaskAndComments(task, comments);
@@ -103,10 +107,10 @@ public class DataInitializer implements ApplicationListener<ContextRefreshedEven
                 }
                 taskList = taskRepository.saveAll(taskList);
                 for (Task task : taskList) {
-                    List<Comment> comments = new ArrayList<>(task.getComments());
+                    List<Comment> comments = new ArrayList<>(commentRepository.findAllByTask(task));
                     for (Comment comment : comments) {
                         User randomUser = UserGenerator.pickRandomUserFromList(users);
-                        connectCommentAndUser(comment,randomUser);
+                        connectCommentAndUser(comment, randomUser);
                         userRepository.save(randomUser);
                     }
                     commentRepository.saveAll(comments);
