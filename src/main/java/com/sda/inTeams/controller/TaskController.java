@@ -2,6 +2,7 @@ package com.sda.inTeams.controller;
 
 import com.sda.inTeams.exception.InvalidOperation;
 import com.sda.inTeams.model.Comment.Comment;
+import com.sda.inTeams.model.Comment.CommentType;
 import com.sda.inTeams.model.Project.Project;
 import com.sda.inTeams.model.Task.Task;
 import com.sda.inTeams.model.Task.TaskStatus;
@@ -37,6 +38,7 @@ public class TaskController {
                 model.addAttribute("taskComments", commentService.getAllByTask(taskId));
                 model.addAttribute("newComment", new Comment());
                 model.addAttribute("ownerId", taskId);
+                model.addAttribute("commentTypes", CommentType.values());
                 model.addAttribute("creatorId", authorizationService.getUserCredentials(principal).get().getId());
                 model.addAttribute("isAdmin", authorizationService.isUserAdmin(principal));
                 return "task-details";

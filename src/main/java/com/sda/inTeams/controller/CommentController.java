@@ -2,6 +2,7 @@ package com.sda.inTeams.controller;
 
 import com.sda.inTeams.exception.InvalidOperation;
 import com.sda.inTeams.model.Comment.Comment;
+import com.sda.inTeams.model.Comment.CommentType;
 import com.sda.inTeams.model.User.User;
 import com.sda.inTeams.repository.TaskRepository;
 import com.sda.inTeams.repository.UserRepository;
@@ -15,6 +16,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequestMapping("/comment")
@@ -34,6 +37,7 @@ public class CommentController {
             model.addAttribute("newComment", new Comment());
             model.addAttribute("ownerId", taskId);
             model.addAttribute("creatorId", user.getId());
+            model.addAttribute("commentTypes", CommentType.values());
             return "comment-add-form";
         } catch (InvalidOperation operation) {
             operation.printStackTrace();
@@ -62,6 +66,7 @@ public class CommentController {
                 model.addAttribute("newComment", commentToEdit);
                 model.addAttribute("ownerId", commentToEdit.getTask().getId());
                 model.addAttribute("creatorId", commentToEdit.getCreator().getId());
+                model.addAttribute("commentTypes", CommentType.values());
                 return "comment-add-form";
             } else {
                 //unauthorized access
