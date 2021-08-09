@@ -27,11 +27,10 @@ public class CommentController {
     private final AuthorizationService authorizationService;
 
     @GetMapping("/add")
-    public String addCommentForm(Model model, Principal principal, long taskId, long userId) {
+    public String addCommentForm(Model model, Principal principal, long taskId) {
         try {
             User user = authorizationService.getUserCredentials(principal).orElseThrow();
             taskService.getByIdOrThrow(taskId);
-            userService.getByIdOrThrow(userId);
             model.addAttribute("newComment", new Comment());
             model.addAttribute("ownerId", taskId);
             model.addAttribute("creatorId", user.getId());

@@ -4,10 +4,7 @@ import com.sda.inTeams.exception.InvalidOperation;
 import com.sda.inTeams.model.User.AccountRole;
 import com.sda.inTeams.model.User.User;
 import com.sda.inTeams.repository.AccountRoleRepository;
-import com.sda.inTeams.service.AuthorizationService;
-import com.sda.inTeams.service.CommentService;
-import com.sda.inTeams.service.TeamService;
-import com.sda.inTeams.service.UserService;
+import com.sda.inTeams.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
@@ -28,6 +25,7 @@ public class UserController {
     private final UserService userService;
     private final TeamService teamService;
     private final CommentService commentService;
+    private final TaskService taskService;
     private final AccountRoleRepository accountRoleRepository;
     private final AuthorizationService authorizationService;
 
@@ -40,6 +38,7 @@ public class UserController {
                 model.addAttribute("teamsAssignedTo", teamService.getTeamsContainingMember(userId));
                 model.addAttribute("teamsOwnedBy", teamService.getTeamsOwnedBy(userId));
                 model.addAttribute("commentsCreated", commentService.getAllUserComments(userId));
+                model.addAttribute("tasksResponsibleFor", taskService.getAllTasksByUserResponsibleFor(user));
                 return "user-details";
             } else {
                 //unauthorized access

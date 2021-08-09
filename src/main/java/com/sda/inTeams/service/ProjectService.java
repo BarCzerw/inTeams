@@ -5,16 +5,14 @@ import com.sda.inTeams.model.Project.Project;
 import com.sda.inTeams.model.Project.ProjectStatus;
 import com.sda.inTeams.model.Task.Task;
 import com.sda.inTeams.model.Team.Team;
+import com.sda.inTeams.model.User.User;
 import com.sda.inTeams.repository.ProjectRepository;
 import com.sda.inTeams.repository.TaskRepository;
 import com.sda.inTeams.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -98,5 +96,10 @@ public class ProjectService implements DatabaseManageable<Project> {
 
     public Project saveToDatabase(Project project) {
         return projectRepository.save(project);
+    }
+
+    public List<User> getAllMembers(Project project) {
+        Team team = teamRepository.findByProjectsContaining(project).orElseThrow();
+        return new ArrayList<>(team.getMembers());
     }
 }

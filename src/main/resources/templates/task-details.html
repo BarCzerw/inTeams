@@ -26,6 +26,10 @@
                 <td th:text="${taskDetails.getStatus().getTextRepresentation()}"></td>
             </tr>
             <tr>
+                <td>Member responsible</td>
+                <td th:text="${taskDetails.getUserResponsible() != null ? (taskDetails.getUserResponsible().getFirstName() + ' ' + taskDetails.getUserResponsible().getLastName()) : 'Account deleted'}"></td>
+            </tr>
+            <tr>
                 <td>Project</td>
                 <td><a th:href="@{'/project/' + ${taskDetails.getProject().getId()}}" th:text="${taskDetails.getProject().getName()}"></a></td>
             </tr>
@@ -52,7 +56,7 @@
             <input type="number" hidden th:name="userId" th:value="${creatorId}">
             <input type="number" hidden th:name="taskId" th:value="${ownerId}">
             <input type="text" th:field="*{text}" placeholder="Your comment">
-            <button class="btn waves-effect waves-light" type="submit">Submit user<i class="material-icons right">send</i></button>
+            <button class="btn waves-effect waves-light" type="submit">Submit comment<i class="material-icons right">send</i></button>
         </form>
     </div>
 </main>

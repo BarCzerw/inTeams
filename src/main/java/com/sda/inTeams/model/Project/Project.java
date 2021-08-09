@@ -21,7 +21,7 @@ public class Project implements Indexable {
 
     private String name;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private Team projectOwner;
 
     @Enumerated(EnumType.STRING)

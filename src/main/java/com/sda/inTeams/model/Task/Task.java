@@ -3,6 +3,7 @@ package com.sda.inTeams.model.Task;
 import com.sda.inTeams.model.Comment.Comment;
 import com.sda.inTeams.model.Indexable;
 import com.sda.inTeams.model.Project.Project;
+import com.sda.inTeams.model.User.User;
 import lombok.*;
 
 import javax.persistence.*;
@@ -27,7 +28,10 @@ public class Task implements Indexable {
     @ManyToOne
     private Project project;
 
-    @OneToMany(mappedBy = "task", fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    private User userResponsible;
+
+    @OneToMany(mappedBy = "task")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Set<Comment> comments;
