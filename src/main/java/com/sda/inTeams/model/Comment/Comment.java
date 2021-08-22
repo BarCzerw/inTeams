@@ -23,10 +23,13 @@ public class Comment implements Indexable {
 
     private String text;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.EAGER)
     private User creator;
 
-    @ManyToOne
+    @Enumerated(EnumType.STRING)
+    private CommentType type;
+
+    @ManyToOne(fetch = FetchType.EAGER)
     private Task task;
 
 }

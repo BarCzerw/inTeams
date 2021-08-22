@@ -45,10 +45,11 @@
             </tr>
             <tr th:each="comment, index : ${taskComments}">
                 <td th:text="${index.index+1}"></td>
+                <td th:text="${comment.getType() != null ? comment.getType().getTextRepresentation() : 'No type'}"></td>
                 <td th:text="${comment.getText()}"></td>
                 <td th:text="${comment.getCreator() != null ? (comment.getCreator().getFirstName() + ' ' + comment.getCreator().getLastName()) : 'Account deleted'}"></td>
-                <!--<td><a th:if="${creatorId==comment.getCreator().getId() || isAdmin}" th:href="@{'/comment/edit/'+${comment.getId()}}">Edit</a></td>
-                <td><a th:if="${creatorId==comment.getCreator().getId() || isAdmin}" th:href="@{'/comment/delete/'+${comment.getId()}}">Delete</a></td>-->
+                <td><a th:if="${creatorId==comment.getCreator().getId() || isAdmin}" th:href="@{'/comment/edit/'+${comment.getId()}}">Edit</a></td>
+                <td><a th:if="${creatorId==comment.getCreator().getId() || isAdmin}" th:href="@{'/comment/delete/'+${comment.getId()}}">Delete</a></td>
             </tr>
         </table>
         <form th:action="@{/comment/add}" method="post" th:object="${newComment}">
@@ -56,6 +57,12 @@
             <input type="number" hidden th:name="userId" th:value="${creatorId}">
             <input type="number" hidden th:name="taskId" th:value="${ownerId}">
             <input type="text" th:field="*{text}" placeholder="Your comment">
+            <select th:field="*{type}" class="browser-default">
+                <option th:each="tp : ${commentTypes}"
+                        th:text="${tp.getTextRepresentation()}"
+                        th:value="${tp}"
+                        th:selected="${newComment.getType()==tp}"></option>
+            </select>
             <button class="btn waves-effect waves-light" type="submit">Submit comment<i class="material-icons right">send</i></button>
         </form>
     </div>

@@ -14,6 +14,7 @@
             <thead>
             <tr>
                 <th>No.</th>
+                <th>Type</th>
                 <th>Text</th>
                 <th>Creator</th>
                 <th>Edit</th>
@@ -23,6 +24,7 @@
             <tbody>
             <tr th:each="comment, index : ${commentList}">
                 <td th:text="${index.index+1}"></td>
+                <td th:text="${comment.getType() != null ? comment.getType().getTextRepresentation() : 'No type'}"></td>
                 <td th:text="${comment.getText()}"></td>
                 <td th:text="${comment.getCreator() != null ? (comment.getCreator().getFirstName() + ' ' + comment.getCreator().getLastName()) : 'Account deleted'}"></td>
                 <td><a th:href="@{'/comment/edit/'+${comment.getId()}}"><i class="material-icons">edit</i></a></td>
